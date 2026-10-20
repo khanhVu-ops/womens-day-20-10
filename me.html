@@ -1023,13 +1023,12 @@
     /* =========================================================
        1. WEB AUDIO SYNTHESIZER
        ========================================================= */
-    class SoundEngine {
+        class SoundEngine {
       constructor() {
         this.ctx = null;
-        this.isPlaying = false;
         this.masterGain = null;
-        this.timer = null;
         this.isMuted = false;
+        this.noiseBuffer = null;
       }
 
       init() {
@@ -1039,8 +1038,9 @@
             if (AudioContext) {
               this.ctx = new AudioContext();
               this.masterGain = this.ctx.createGain();
-              this.masterGain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+              this.masterGain.gain.setValueAtTime(0.35, this.ctx.currentTime);
               this.masterGain.connect(this.ctx.destination);
+              this.buildNoiseBuffer();
             }
           }
           if (this.ctx && this.ctx.state === 'suspended') {
@@ -1049,8 +1049,197 @@
         } catch (e) {}
       }
 
+      buildNoiseBuffer() {
+        if (!this.ctx) return;
+        const bufferSize = this.ctx.sampleRate * 2;
+        this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const output = this.noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+        }
+      }
+
+      // 1. TYPEWRITER / KEYSTROKE CLICK (Soft vintage key tap)
+      playTypewriterClick(isSpace = false) {
+        try {
+          this.init();
+          if (!this.ctx || this.isMuted) return;
+          const now = this.ctx.currentTime;
+
+          if (this.noiseBuffer) {
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = this.noiseBuffer;
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime((isSpace ? 750 : 1550) + (Math.random() - 0.5) * 260, now);
+            filter.Q.setValueAtTime(3.0, now);
+
+            const gain = this.ctx.createGain();
+            gain.gain.setValueAtTime(isSpace ? 0.08 : 0.06, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + (isSpace ? 0.035 : 0.022));
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.masterGain);
+            noise.start(now);
+            noise.stop(now + 0.04);
+          }
+
+          const thud = this.ctx.createOscillator();
+          const thudGain = this.ctx.createGain();
+          thud.type = 'triangle';
+          thud.frequency.setValueAtTime(isSpace ? 110 : 160 + Math.random() * 25, now);
+          thudGain.gain.setValueAtTime(0.045, now);
+          thudGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.028);
+          thud.connect(thudGain);
+          thudGain.connect(this.masterGain);
+          thud.start(now);
+          thud.stop(now + 0.032);
+        } catch (e) {}
+      }
+
+      // 2. FLOWER PLUCK & LIFT CHIME (Sparkle pluck)
+      playFlowerPluck(idx = 0) {
+        try {
+          this.init();
+          if (!this.ctx || this.isMuted) return;
+          const now = this.ctx.currentTime;
+          const notes = [523.25, 659.25, 783.99, 987.77, 1046.50, 1318.51];
+          const freq = notes[idx % notes.length];
+
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.08, now + 0.25);
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.exponentialRampToValueAtTime(0.25, now + 0.035);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
+
+          osc.connect(gain);
+          gain.connect(this.masterGain);
+          osc.start(now);
+          osc.stop(now + 0.7);
+
+          const shimmer = this.ctx.createOscillator();
+          const sGain = this.ctx.createGain();
+          shimmer.type = 'triangle';
+          shimmer.frequency.setValueAtTime(freq * 2, now);
+          sGain.gain.setValueAtTime(0.09, now);
+          sGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+          shimmer.connect(sGain);
+          sGain.connect(this.masterGain);
+          shimmer.start(now);
+          shimmer.stop(now + 0.45);
+        } catch (e) {}
+      }
+
+      // 3. PAPER RUSTLE / SATIN RIBBON SWOOSH (Wrapping flowers)
+      playWrapSwoosh() {
+        try {
+          this.init();
+          if (!this.ctx || this.isMuted || !this.noiseBuffer) return;
+          const now = this.ctx.currentTime;
+
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = this.noiseBuffer;
+
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(250, now);
+          filter.frequency.exponentialRampToValueAtTime(2800, now + 0.35);
+          filter.frequency.exponentialRampToValueAtTime(350, now + 0.75);
+
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.01, now);
+          gain.gain.linearRampToValueAtTime(0.2, now + 0.3);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
+
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.masterGain);
+          noise.start(now);
+          noise.stop(now + 0.85);
+        } catch (e) {}
+      }
+
+      // 4. BOUQUET REVEAL CHIME CHORD
+      playBouquetReveal() {
+        try {
+          this.init();
+          if (!this.ctx || this.isMuted) return;
+          const now = this.ctx.currentTime;
+          const chord = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+          chord.forEach((f, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, now + i * 0.08);
+
+            gain.gain.setValueAtTime(0.001, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.22, now + i * 0.08 + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.08 + 1.2);
+
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 1.25);
+          });
+        } catch (e) {}
+      }
+
+      // 5. ENVELOPE WAX SEAL POP & OPEN
+      playEnvelopeOpen() {
+        try {
+          this.init();
+          if (!this.ctx || this.isMuted) return;
+          const now = this.ctx.currentTime;
+
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(340, now);
+          osc.frequency.exponentialRampToValueAtTime(75, now + 0.085);
+
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.095);
+
+          osc.connect(gain);
+          gain.connect(this.masterGain);
+          osc.start(now);
+          osc.stop(now + 0.1);
+
+          setTimeout(() => this.playWrapSwoosh(), 70);
+        } catch (e) {}
+      }
+
+      // 6. CONFETTI BURST POP
+      playConfettiBurst() {
+        try {
+          this.init();
+          if (!this.ctx || this.isMuted) return;
+          const now = this.ctx.currentTime;
+
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(130, now);
+          osc.frequency.exponentialRampToValueAtTime(45, now + 0.16);
+
+          gain.gain.setValueAtTime(0.38, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+
+          osc.connect(gain);
+          gain.connect(this.masterGain);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } catch (e) {}
+      }
+
       playTone(freq, type = 'sine', duration = 1.6, gainVal = 0.25) {
         try {
+          this.init();
           if (!this.ctx || this.isMuted) return;
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
@@ -1071,57 +1260,14 @@
           this.init();
           const notes = [440, 523.25, 659.25, 783.99, 880, 1046.50, 1318.51];
           notes.forEach((freq, idx) => {
-            setTimeout(() => this.playTone(freq, 'sine', 2.0, 0.2), idx * 80);
+            setTimeout(() => this.playTone(freq, 'sine', 1.8, 0.18), idx * 75);
           });
         } catch (e) {}
       }
 
-      startGentleLofiLoop() {
-        try {
-          if (this.isPlaying) return;
-          this.init();
-          this.isPlaying = true;
-          const progressions = [
-            [261.63, 329.63, 392.00, 493.88],
-            [220.00, 261.63, 329.63, 392.00],
-            [174.61, 220.00, 261.63, 329.63],
-            [196.00, 261.63, 293.66, 392.00]
-          ];
-          let chordIdx = 0;
-          const tick = () => {
-            if (!this.isPlaying) return;
-            const chord = progressions[chordIdx];
-            chord.forEach((freq, i) => {
-              setTimeout(() => this.playTone(freq, 'triangle', 2.4, 0.09), i * 160);
-            });
-            const melody = [523.25, 587.33, 659.25, 783.99, 880.00];
-            setTimeout(() => {
-              const rNote = melody[Math.floor(Math.random() * melody.length)];
-              this.playTone(rNote, 'sine', 1.5, 0.08);
-            }, 800);
-            chordIdx = (chordIdx + 1) % progressions.length;
-            this.timer = setTimeout(tick, 2800);
-          };
-          tick();
-        } catch (e) {}
-      }
-
-      stopLofiLoop() {
-        this.isPlaying = false;
-        if (this.timer) clearTimeout(this.timer);
-      }
-
-      toggleMute() {
-        this.isMuted = !this.isMuted;
-        if (this.masterGain && this.ctx) {
-          try {
-            this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 0.18, this.ctx.currentTime);
-          } catch (e) {}
-        }
-        return this.isMuted;
-      }
+      startGentleLofiLoop() {}
+      stopLofiLoop() {}
     }
-
     const sound = new SoundEngine();
 
     /* =========================================================
@@ -1351,7 +1497,7 @@
 
         cards.forEach((card, idx) => {
           setTimeout(() => {
-            sound.playTone(659.25 + idx * 80, 'triangle', 1.5, 0.2);
+            sound.playFlowerPluck(idx); // Tiếng hái hoa thánh thót lấp lánh
             card.classList.add('gathering');
             for (let p = 0; p < 12; p++) {
               petals.push(createPetal(true, width * 0.5 + (Math.random() - 0.5) * 100, height * 0.5));
@@ -1359,9 +1505,14 @@
           }, idx * 350);
         });
 
-        // After all gathered -> REVEAL BOUQUET (after 2.6s)
+        // Tiếng xoè giấy lụa & ruy băng gói hoa
         setTimeout(() => {
-          sound.playHarpGlissando();
+          sound.playWrapSwoosh();
+        }, 1600);
+
+        // After all gathered -> REVEAL BOUQUET with triumph chimes
+        setTimeout(() => {
+          sound.playBouquetReveal(); // Chùm chuông pha lê khi bó hoa xuất hiện
           triggerConfettiBurst(80);
 
           stageGardenCinematic.classList.remove('active');
@@ -1375,16 +1526,64 @@
     }
 
     // OPEN LETTER
+    // Save initial raw message text for typewriter effect
+    const letterTextEl = document.getElementById('letterTextBody');
+    const initialLetterMessage = letterTextEl ? letterTextEl.textContent.trim() : '';
+    let typewriterTimer = null;
+    let isTyping = false;
+
+    function startTypewriterLetter() {
+      if (!letterTextEl || !initialLetterMessage) return;
+      if (typewriterTimer) clearInterval(typewriterTimer);
+      letterTextEl.textContent = '';
+      isTyping = true;
+      let charIdx = 0;
+      const speed = 20;
+
+      typewriterTimer = setInterval(() => {
+        if (charIdx < initialLetterMessage.length) {
+          const ch = initialLetterMessage.charAt(charIdx);
+          letterTextEl.textContent += ch;
+          // Gõ âm thanh cách nốt để chân thực như phím cơ gõ
+          if (charIdx % 2 === 0 || ch === ' ' || ch === '
+') {
+            sound.playTypewriterClick(ch === ' ' || ch === '
+');
+          }
+          charIdx++;
+        } else {
+          clearInterval(typewriterTimer);
+          typewriterTimer = null;
+          isTyping = false;
+        }
+      }, speed);
+    }
+
     function openLetterCard() {
-      sound.playHarpGlissando();
+      sound.playEnvelopeOpen(); // Tiếng bóc tem sáp & mở thư
       triggerConfettiBurst(50);
 
       stageBouquetReveal.classList.remove('active');
       setTimeout(() => {
         stageBouquetReveal.style.display = 'none';
-        stageLetterView.classList.add('active');
-      }, 600);
+        stageLetterView.style.display = 'flex';
+        setTimeout(() => {
+          stageLetterView.classList.add('active');
+          startTypewriterLetter(); // Bắt đầu gõ từng chữ kèm tiếng gõ phím
+        }, 20);
+      }, 500);
     }
+
+    // Nhấp vào thư để hiện toàn bộ chữ ngay nếu không muốn chờ gõ
+    document.getElementById('stageLetterView').addEventListener('click', (e) => {
+      if (e.target.closest('#btnMysteryGift')) return;
+      if (isTyping && typewriterTimer) {
+        clearInterval(typewriterTimer);
+        typewriterTimer = null;
+        isTyping = false;
+        if (letterTextEl) letterTextEl.textContent = initialLetterMessage;
+      }
+    });
 
     document.getElementById('tuckedLetter').addEventListener('click', openLetterCard);
     document.getElementById('btnOpenLetter').addEventListener('click', openLetterCard);
@@ -1394,6 +1593,7 @@
       const bgAudio = document.getElementById('bgAudio');
       if (bgAudio) bgAudio.pause();
       sound.stopLofiLoop();
+      sound.playConfettiBurst(); // Tiếng nổ pháo hoa rộn rã
       triggerConfettiBurst(120);
 
       ambientBg.classList.add('party-mode');
