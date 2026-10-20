@@ -1002,6 +1002,9 @@
           <button class="action-pill-btn primary" id="btnFlowerRain">
             <span>🌸</span> Rắc Mưa Hoa
           </button>
+          <button class="action-pill-btn" id="btnReplayVideo">
+            <span>▶️</span> Phát Lại Video
+          </button>
           <button class="action-pill-btn" id="btnBackToLetter">
             <span>💌</span> Xem Lại Thư
           </button>
@@ -1418,20 +1421,60 @@
       sound.playTone(1046.50, 'sine', 1.0, 0.2);
     });
 
-    document.getElementById('btnBackToLetter').addEventListener('click', () => {
+    // Replay Video
+    const btnReplayVideo = document.getElementById('btnReplayVideo');
+    if (btnReplayVideo) {
+      btnReplayVideo.addEventListener('click', (e) => {
+        e.stopPropagation();
+        bnhVideo.currentTime = 0;
+        bnhVideo.play().then(() => videoPlayHint.classList.remove('visible')).catch(() => {});
+      });
+    }
+
+    // Go Back to Letter
+    document.getElementById('btnBackToLetter').addEventListener('click', (e) => {
+      e.stopPropagation();
       bnhVideo.pause();
+      bnhVideo.currentTime = 0;
       ambientBg.classList.remove('party-mode');
       stageFinale.classList.remove('active');
+
       setTimeout(() => {
         stageFinale.style.display = 'none';
-        stageLetterView.classList.add('active');
+        stageLetterView.style.display = 'flex';
+        setTimeout(() => stageLetterView.classList.add('active'), 20);
         sound.startGentleLofiLoop();
-      }, 600);
+      }, 400);
     });
 
-    document.getElementById('btnReplayAll').addEventListener('click', () => {
+    // Replay Entire Journey
+    document.getElementById('btnReplayAll').addEventListener('click', (e) => {
+      e.stopPropagation();
       bnhVideo.pause();
-      location.reload();
+      bnhVideo.currentTime = 0;
+      ambientBg.classList.remove('party-mode');
+
+      stageFinale.classList.remove('active');
+      stageFinale.style.display = 'none';
+      stageLetterView.classList.remove('active');
+      stageLetterView.style.display = 'none';
+      stageBouquetReveal.classList.remove('active');
+      stageBouquetReveal.style.display = 'none';
+      stageGardenCinematic.classList.remove('active');
+      stageGardenCinematic.style.display = 'none';
+
+      // Reset flowers and hero
+      document.querySelectorAll('.garden-flower-card').forEach(c => c.classList.remove('gathering'));
+      singleHeroFlower.style.display = 'block';
+      singleHeroFlower.style.opacity = '1';
+      singleHeroFlower.style.transform = 'scale(1)';
+      gardenMeadowRow.style.display = 'none';
+
+      stageIntro.style.display = 'flex';
+      setTimeout(() => {
+        stageIntro.style.opacity = '1';
+        stageIntro.style.transform = 'scale(1)';
+      }, 50);
     });
 
     const soundToggleBtn = document.getElementById('soundToggleBtn');
