@@ -50,7 +50,7 @@
     }
 
     #bgCanvas { z-index: 1; }
-    #confettiCanvas { z-index: 99; }
+    #confettiCanvas { z-index: 15; touch-action: none !important; }
 
     /* Scenic Garden Background */
     .garden-bg-image {
@@ -119,7 +119,7 @@
     .app-viewport {
       position: absolute;
       inset: 0;
-      z-index: 10;
+      z-index: 20;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1047,6 +1047,15 @@
           if (this.ctx && this.ctx.state === 'suspended') {
             this.ctx.resume().catch(() => {});
           }
+          if (this.ctx) {
+            const osc = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            g.gain.value = 0.00001;
+            osc.connect(g);
+            g.connect(this.ctx.destination);
+            osc.start(0);
+            osc.stop(this.ctx.currentTime + 0.001);
+          }
         } catch (e) {}
       }
 
@@ -1459,10 +1468,8 @@
         if (charIdx < initialLetterMessage.length) {
           const ch = initialLetterMessage.charAt(charIdx);
           letterTextEl.textContent += ch;
-          if (charIdx % 2 === 0 || ch === ' ' || ch === '
-') {
-            try { sound.playTypewriterClick(ch === ' ' || ch === '
-'); } catch (e) {}
+          if (charIdx % 2 === 0 || ch === ' ' || ch === '\n') {
+            try { sound.playTypewriterClick(ch === ' ' || ch === '\n'); } catch (e) {}
           }
           charIdx++;
         } else {
@@ -1486,19 +1493,27 @@
       });
     }
 
-    // 1. START EXPERIENCE (Touch & Click support for iOS Safari)
+    // 1. START EXPERIENCE (Ultra-resilient iOS Safari & Mobile touch handling)
     let hasStarted = false;
+    let userManuallyPaused = false;
+
     window.handleStart = function(e) {
       if (e && e.stopPropagation) e.stopPropagation();
       if (hasStarted) return;
       hasStarted = true;
 
-      // Play audio safely
+      // Unmute & play audio safely in user gesture
       try {
         const bgAudio = document.getElementById('bgAudio');
         if (bgAudio) {
           try { bgAudio.volume = 0.65; } catch (err) {}
-          bgAudio.play().catch(() => {});
+          const p = bgAudio.play();
+          if (p !== undefined) {
+            p.then(() => {
+              if (musicIconOn) musicIconOn.style.display = 'block';
+              if (musicIconOff) musicIconOff.style.display = 'none';
+            }).catch(() => {});
+          }
         }
       } catch (err) {}
 
@@ -1516,8 +1531,33 @@
       }, 550);
     };
 
-    stageIntro.addEventListener('click', window.handleStart);
-    stageIntro.addEventListener('touchend', window.handleStart);
+    if (stageIntro) {
+      stageIntro.addEventListener('click', window.handleStart);
+      stageIntro.addEventListener('touchend', window.handleStart);
+    }
+    const tapStartBtn = document.getElementById('tapStartBtn');
+    if (tapStartBtn) {
+      tapStartBtn.addEventListener('click', window.handleStart);
+      tapStartBtn.addEventListener('touchend', window.handleStart);
+    }
+    document.addEventListener('click', function(e) {
+      if (!hasStarted) {
+        window.handleStart(e);
+      }
+    });
+    document.addEventListener('touchstart', function() {
+      try { sound.init(); } catch (err) {}
+      const bgAudio = document.getElementById('bgAudio');
+      if (bgAudio) {
+        try { bgAudio.load(); } catch (e) {}
+      }
+    }, { passive: true, once: true });
+    document.addEventListener('touchend', function() {
+      const bgAudio = document.getElementById('bgAudio');
+      if (hasStarted && bgAudio && bgAudio.paused && !userManuallyPaused) {
+        bgAudio.play().catch(() => {});
+      }
+    }, { passive: true });
 
     function runCinematicSequence() {
       stageGardenCinematic.classList.add('active');
@@ -1707,16 +1747,21 @@
 
     window.toggleSound = function(e) {
       if (e && e.stopPropagation) e.stopPropagation();
+      try { sound.init(); } catch (err) {}
       const bgAudio = document.getElementById('bgAudio');
       if (bgAudio) {
         if (bgAudio.paused) {
-          bgAudio.play().catch(() => {});
-          musicIconOn.style.display = 'block';
-          musicIconOff.style.display = 'none';
+          userManuallyPaused = false;
+          try { bgAudio.volume = 0.65; } catch (err) {}
+          bgAudio.play().then(() => {
+            if (musicIconOn) musicIconOn.style.display = 'block';
+            if (musicIconOff) musicIconOff.style.display = 'none';
+          }).catch(() => {});
         } else {
+          userManuallyPaused = true;
           bgAudio.pause();
-          musicIconOn.style.display = 'none';
-          musicIconOff.style.display = 'block';
+          if (musicIconOn) musicIconOn.style.display = 'none';
+          if (musicIconOff) musicIconOff.style.display = 'block';
         }
       }
     };
