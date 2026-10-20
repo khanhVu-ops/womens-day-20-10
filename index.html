@@ -819,6 +819,7 @@
   <div class="ambient-bg" id="ambientBg"></div>
   <canvas id="bgCanvas"></canvas>
   <canvas id="confettiCanvas"></canvas>
+  <audio id="bgAudio" src="bg_music.mp3" loop preload="auto"></audio>
 
   <div class="sound-btn-box">
     <button class="glass-btn-icon" id="soundToggleBtn" title="Bật/Tắt Nhạc Nền">
@@ -1292,7 +1293,11 @@
 
     // Trigger Start
     stageIntro.addEventListener('click', () => {
-      sound.startGentleLofiLoop();
+      const bgAudio = document.getElementById('bgAudio');
+      if (bgAudio) {
+        bgAudio.volume = 0.65;
+        bgAudio.play().catch(e => console.log('Audio play error:', e));
+      }
       sound.playHarpGlissando();
 
       stageIntro.style.opacity = '0';
@@ -1386,6 +1391,8 @@
 
     // TRIGGER MYSTERY GIFT -> VIDEO (KHÁ BẢNH)
     document.getElementById('btnMysteryGift').addEventListener('click', () => {
+      const bgAudio = document.getElementById('bgAudio');
+      if (bgAudio) bgAudio.pause();
       sound.stopLofiLoop();
       triggerConfettiBurst(120);
 
@@ -1443,6 +1450,8 @@
         stageFinale.style.display = 'none';
         stageLetterView.style.display = 'flex';
         setTimeout(() => stageLetterView.classList.add('active'), 20);
+        const bgAudio = document.getElementById('bgAudio');
+        if (bgAudio) bgAudio.play().catch(() => {});
         sound.startGentleLofiLoop();
       }, 400);
     });
@@ -1482,11 +1491,17 @@
     const musicIconOff = document.getElementById('musicIconOff');
 
     soundToggleBtn.addEventListener('click', () => {
-      const muted = sound.toggleMute();
-      musicIconOn.style.display = muted ? 'none' : 'block';
-      musicIconOff.style.display = muted ? 'block' : 'none';
-      if (!muted && !sound.isPlaying && !stageFinale.classList.contains('active')) {
-        sound.startGentleLofiLoop();
+      const bgAudio = document.getElementById('bgAudio');
+      if (bgAudio) {
+        if (bgAudio.paused) {
+          bgAudio.play().catch(() => {});
+          musicIconOn.style.display = 'block';
+          musicIconOff.style.display = 'none';
+        } else {
+          bgAudio.pause();
+          musicIconOn.style.display = 'none';
+          musicIconOff.style.display = 'block';
+        }
       }
     });
 
