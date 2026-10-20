@@ -2,23 +2,35 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Bó Hoa Tặng Chị Em - Chúc Mừng 20/10</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Bó Hoa Chúc Mừng Chị Em Đồng Nghiệp - 20/10</title>
+  
+  <!-- Luxury Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
   
+  <!-- Local Three.js with CDN Fallback -->
+  <script src="js/three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
+
   <style>
     :root {
-      --primary-pink: #ff6b9d;
-      --deep-pink: #c41e5e;
-      --soft-rose: #ffafcc;
-      --gold: #f6d365;
-      --gold-dark: #fda085;
-      --accent-glow: rgba(255, 107, 157, 0.45);
-      --bg-dark: #08020e;
-      --glass-bg: rgba(18, 6, 26, 0.88);
-      --glass-border: rgba(255, 182, 193, 0.35);
+      --gold-primary: #ffd700;
+      --gold-light: #fff2b2;
+      --gold-dark: #b8860b;
+      --gold-gradient: linear-gradient(135deg, #fff5c0 0%, #ffd700 40%, #e6a817 75%, #b37d14 100%);
+      --rose-primary: #ff2d75;
+      --rose-glow: rgba(255, 45, 117, 0.55);
+      --glass-bg: rgba(18, 6, 28, 0.72);
+      --glass-border: rgba(255, 215, 0, 0.32);
+      --font-serif: 'Playfair Display', serif;
+      --font-royal: 'Cinzel', serif;
+      --font-sans: 'Montserrat', sans-serif;
     }
 
     * {
@@ -28,94 +40,128 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
     }
 
-    body, html {
+    html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: var(--bg-dark);
-      font-family: 'Montserrat', sans-serif;
+      background: #08010f;
+      font-family: var(--font-sans);
       color: #fff;
+      touch-action: manipulation;
     }
 
-    #bgCanvas, #confettiCanvas {
+    /* 3D WebGL Canvas Layer */
+    #webglCanvas {
       position: absolute;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100%;
       height: 100%;
+      z-index: 5;
+      display: block;
+      pointer-events: auto;
+    }
+
+    /* 2D Overlay Confetti Canvas */
+    #confettiCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 15;
       pointer-events: none !important;
+      touch-action: none !important;
     }
 
-    #bgCanvas { z-index: 1; }
-    #confettiCanvas { z-index: 15; touch-action: none !important; }
-
-    /* Scenic Garden Background */
-    .garden-bg-image {
+    /* Ambient Scenic Vignette */
+    .ambient-lighting {
       position: absolute;
       inset: 0;
-      background-image: url('images/garden_bg.jpg');
-      background-size: cover;
-      background-position: center bottom;
-      opacity: 0.22;
-      filter: blur(4px);
-      z-index: 0;
-      transition: opacity 2s ease;
+      background: radial-gradient(circle at 50% 40%, transparent 30%, rgba(8, 1, 15, 0.8) 85%, #08010f 100%);
       pointer-events: none;
+      z-index: 6;
+      transition: all 1.2s ease;
     }
 
-    .ambient-bg {
+    .ambient-lighting.party-mode {
+      animation: discoStrobe 1.2s infinite alternate;
+    }
+
+    @keyframes discoStrobe {
+      0% { background: radial-gradient(circle at 50% 40%, rgba(255, 0, 128, 0.25) 0%, rgba(8, 1, 15, 0.85) 90%); }
+      50% { background: radial-gradient(circle at 50% 40%, rgba(0, 240, 255, 0.25) 0%, rgba(8, 1, 15, 0.85) 90%); }
+      100% { background: radial-gradient(circle at 50% 40%, rgba(255, 215, 0, 0.25) 0%, rgba(8, 1, 15, 0.85) 90%); }
+    }
+
+    /* Sound Control Button */
+    .sound-control-box {
       position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 35%, rgba(66, 14, 88, 0.8) 0%, rgba(20, 4, 32, 0.95) 55%, #08020e 100%);
-      z-index: 1;
-      transition: background 1.5s ease;
-      pointer-events: none;
-    }
-
-    .ambient-bg.party-mode {
-      background: radial-gradient(circle at 50% 50%, rgba(85, 10, 102, 0.9) 0%, rgba(30, 4, 52, 0.95) 45%, #05010a 100%);
-    }
-
-    .sound-btn-box {
-      position: absolute;
-      top: 18px;
-      right: 18px;
+      top: 20px;
+      right: 20px;
       z-index: 60;
     }
 
-    .glass-btn-icon {
-      width: 44px;
-      height: 44px;
+    .luxury-icon-btn {
+      width: 46px;
+      height: 46px;
       border-radius: 50%;
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #ffd1dc;
+      color: #ffd700;
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-      transition: all 0.3s ease;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 215, 0, 0.25);
+      transition: all 0.35s ease;
     }
 
-    .glass-btn-icon:hover {
+    .luxury-icon-btn:hover, .luxury-icon-btn:active {
       transform: scale(1.1);
-      border-color: var(--primary-pink);
-      color: #fff;
-      box-shadow: 0 0 15px var(--accent-glow);
+      box-shadow: 0 0 25px var(--gold-primary);
+      border-color: #fff;
     }
 
-    .glass-btn-icon svg {
+    .luxury-icon-btn svg {
       width: 22px;
       height: 22px;
       fill: currentColor;
     }
 
+    /* Recipient Category Navigation Pills */
+    .vip-category-nav {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 60;
+      display: flex;
+      gap: 8px;
+    }
+
+    .cat-nav-pill {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.7);
+      background: rgba(20, 6, 32, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .cat-nav-pill.active, .cat-nav-pill:hover {
+      color: #ffd700;
+      background: rgba(255, 215, 0, 0.15);
+      border-color: #ffd700;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    }
+
+    /* Main UI Viewport */
     .app-viewport {
       position: absolute;
       inset: 0;
@@ -125,10 +171,16 @@
       align-items: center;
       justify-content: center;
       padding: 16px;
+      pointer-events: none;
+    }
+
+    /* Interactive elements inside viewport re-enable pointer */
+    .interactive-layer {
+      pointer-events: auto;
     }
 
     /* ========================================================
-       STAGE 0: GENTLE TOUCH TO BEGIN
+       STAGE 0: CINEMATIC OPENING (3D GLOWING ROSE BUD)
        ======================================================== */
     #stageIntro {
       position: absolute;
@@ -140,335 +192,167 @@
       text-align: center;
       cursor: pointer;
       z-index: 30;
-      transition: all 0.8s ease;
-      padding: 20px;
+      transition: all 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+      padding: 24px;
+      pointer-events: auto;
     }
 
-    .intro-flower-icon {
-      width: 130px;
-      height: 130px;
+    .intro-crystal-seal {
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
-      box-shadow: 0 0 35px rgba(255, 107, 157, 0.8), 0 0 70px rgba(246, 211, 101, 0.5);
-      border: 2px solid rgba(255, 255, 255, 0.3);
+      border: 2px solid rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 45px rgba(255, 45, 117, 0.8), 0 0 80px rgba(255, 215, 0, 0.45);
       overflow: hidden;
       margin-bottom: 24px;
-      animation: breatheGlow 2.5s infinite alternate;
       position: relative;
+      animation: crystalBreathe 3.5s ease-in-out infinite alternate;
+      background: radial-gradient(circle, rgba(255, 45, 117, 0.3) 0%, rgba(10, 2, 20, 0.8) 80%);
     }
 
-    .intro-flower-icon img {
+    .intro-crystal-seal img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transform: scale(1.08);
+      filter: contrast(1.1) brightness(1.05);
     }
 
-    .intro-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 30px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #fff 15%, #ffd1dc 55%, #f6d365 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 1px;
+    @keyframes crystalBreathe {
+      0% { transform: scale(0.96) rotate(-2deg); box-shadow: 0 0 35px rgba(255, 45, 117, 0.6), 0 0 60px rgba(255, 215, 0, 0.3); }
+      100% { transform: scale(1.05) rotate(2deg); box-shadow: 0 0 60px rgba(255, 45, 117, 0.95), 0 0 110px rgba(255, 215, 0, 0.6); }
+    }
+
+    .royal-badge {
+      font-family: var(--font-royal);
+      font-size: 11px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold-primary);
       margin-bottom: 12px;
+      text-shadow: 0 0 12px var(--gold-glow);
     }
 
-    .intro-sub {
-      font-size: 15px;
-      color: rgba(255, 225, 240, 0.9);
-      margin-bottom: 24px;
-      font-weight: 400;
-    }
-
-    .tap-start-btn {
-      padding: 12px 30px;
-      border-radius: 30px;
-      background: linear-gradient(135deg, #ff6b9d 0%, #c41e5e 100%);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #fff;
-      font-weight: 700;
-      font-size: 15px;
-      letter-spacing: 0.5px;
-      box-shadow: 0 6px 25px rgba(255, 107, 157, 0.6);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      animation: pulseBtn 1.8s infinite;
-    }
-
-    /* ========================================================
-       STAGE 1: CINEMATIC FLOWER & ENCHANTED GARDEN
-       ======================================================== */
-    #stageGardenCinematic {
-      position: absolute;
-      inset: 0;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 30;
-      opacity: 0;
-      transition: opacity 1s ease;
-      padding: 20px;
-    }
-
-    #stageGardenCinematic.active {
-      display: flex;
-      opacity: 1;
-    }
-
-    /* Central Story Caption */
-    .story-caption-box {
-      text-align: center;
-      margin-bottom: 26px;
-      max-width: 620px;
-      min-height: 70px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 25;
-    }
-
-    .story-caption-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 26px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #fff, #ffd1dc, #f6d365);
+    .intro-royal-title {
+      font-family: var(--font-royal);
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      background: var(--gold-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 6px;
-      letter-spacing: 0.5px;
-      text-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
-      transition: all 0.5s ease;
+      margin-bottom: 12px;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+      line-height: 1.25;
     }
 
-    .story-caption-desc {
-      font-size: 14.5px;
-      color: rgba(255, 220, 235, 0.85);
-      font-weight: 400;
-      transition: all 0.5s ease;
+    .intro-poetic-sub {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 15.5px;
+      color: #ffeef4;
+      max-width: 440px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
     }
 
-    /* Act 1: Single Rose Hero Container */
-    #singleHeroFlower {
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      border: 3px solid rgba(255, 182, 193, 0.5);
-      box-shadow: 0 0 50px rgba(255, 64, 129, 0.6), 0 0 100px rgba(246, 211, 101, 0.4);
-      overflow: hidden;
-      position: relative;
-      animation: floatHero 4s ease-in-out infinite alternate;
-      transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    #singleHeroFlower img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scale(1.05);
-    }
-
-    /* ========================================================
-       ACT 2: NATURAL ENCHANTED BOTANICAL GARDEN MEADOW
-       ======================================================== */
-    #enchantedGardenMeadow {
-      display: none;
-      position: relative;
-      width: 100%;
-      max-width: 540px;
-      height: 295px;
-      margin: 8px auto 0;
-      z-index: 20;
-    }
-
-    .garden-terrain-bed {
-      position: absolute;
-      bottom: 0;
-      left: 1%;
-      right: 1%;
-      height: 52px;
-      background: radial-gradient(ellipse at 50% 100%, rgba(34, 139, 34, 0.5) 0%, rgba(13, 59, 28, 0.55) 45%, transparent 75%);
-      border-radius: 50% 50% 0 0 / 25px 25px 0 0;
-      filter: blur(2px);
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .garden-grass-fringe {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 28px;
-      background: repeating-linear-gradient(
-        80deg,
-        transparent 0px,
-        transparent 5px,
-        rgba(74, 222, 128, 0.3) 6px,
-        rgba(34, 197, 94, 0.42) 8px,
-        transparent 11px
-      );
-      z-index: 8;
-      pointer-events: none;
-    }
-
-    /* Living Flower Stalk */
-    .garden-bloom {
-      position: absolute;
-      bottom: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transform-origin: bottom center;
-      transition: transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
+    .vip-start-btn {
+      padding: 15px 36px;
+      border-radius: 40px;
+      background: linear-gradient(135deg, rgba(255, 45, 117, 0.85) 0%, rgba(200, 20, 90, 0.95) 100%);
+      border: 1.5px solid rgba(255, 215, 0, 0.6);
+      box-shadow: 0 0 30px rgba(255, 45, 117, 0.7), 0 6px 25px rgba(0, 0, 0, 0.5);
+      color: #fff;
+      font-family: var(--font-royal);
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
       cursor: pointer;
-      opacity: 0;
-      transform: scale(0) translateY(55px);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.4s ease;
+      animation: pulseStart 2.5s infinite;
     }
 
-    .garden-bloom.blooming {
-      opacity: 1;
-      transform: scale(1) translateY(0);
+    .vip-start-btn:hover, .vip-start-btn:active {
+      transform: scale(1.08);
+      box-shadow: 0 0 50px rgba(255, 215, 0, 0.9), 0 0 70px rgba(255, 45, 117, 0.9);
+      border-color: #ffffff;
     }
 
-    /* Sway animations with subtle natural variation */
-    .garden-bloom.sway-1 { animation: swayWind1 4.2s ease-in-out infinite alternate; }
-    .garden-bloom.sway-2 { animation: swayWind2 3.6s ease-in-out infinite alternate; }
-    .garden-bloom.sway-3 { animation: swayWind3 4.8s ease-in-out infinite alternate; }
-    .garden-bloom.sway-4 { animation: swayWind4 3.9s ease-in-out infinite alternate; }
-
-    @keyframes swayWind1 {
-      0% { transform: scale(1) translateY(0) rotate(-2.5deg); }
-      100% { transform: scale(1) translateY(0) rotate(3deg); }
-    }
-    @keyframes swayWind2 {
-      0% { transform: scale(1) translateY(0) rotate(3.2deg); }
-      100% { transform: scale(1) translateY(0) rotate(-2.2deg); }
-    }
-    @keyframes swayWind3 {
-      0% { transform: scale(1) translateY(0) rotate(-1.8deg); }
-      100% { transform: scale(1) translateY(0) rotate(2.4deg); }
-    }
-    @keyframes swayWind4 {
-      0% { transform: scale(1) translateY(0) rotate(2deg); }
-      100% { transform: scale(1) translateY(0) rotate(-2.8deg); }
-    }
-
-    /* Blossom Head */
-    .bloom-head {
-      position: relative;
-      border-radius: 50%;
-      overflow: hidden;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6), 0 0 35px var(--glow, rgba(255, 107, 157, 0.5));
-      border: 2px solid rgba(255, 255, 255, 0.38);
-      transition: transform 0.35s ease, filter 0.35s ease;
-    }
-
-    .bloom-head:hover, .bloom-head:active {
-      transform: scale(1.1) !important;
-      filter: brightness(1.15);
-    }
-
-    .bloom-head img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transform: scale(1.06);
-    }
-
-    /* Dewdrop Glisten */
-    .dew-sparkle {
-      position: absolute;
-      top: 15%;
-      right: 20%;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ffffff 40%, rgba(255, 255, 255, 0.4) 80%, transparent);
-      box-shadow: 0 0 10px #ffffff;
-      animation: dewGlint 2.8s ease-in-out infinite;
-    }
-
-    @keyframes dewGlint {
-      0%, 100% { opacity: 0.3; transform: scale(0.8); }
-      50% { opacity: 1; transform: scale(1.3); }
-    }
-
-    /* Organic Stem & Leaves */
-    .bloom-stem {
-      width: 5px;
-      border-radius: 3px;
-      background: linear-gradient(to bottom, #86efac 0%, #22c55e 30%, #15803d 70%, #064e3b 100%);
-      box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
-      position: relative;
-    }
-
-    .bloom-leaf {
-      position: absolute;
-      width: 18px;
-      height: 10px;
-      background: linear-gradient(135deg, #4ade80, #166534);
-      border-radius: 14px 0 14px 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    }
-
-    .bloom-leaf.left {
-      left: -14px;
-      top: 35%;
-      transform: rotate(-30deg);
-    }
-
-    .bloom-leaf.right {
-      right: -14px;
-      top: 55%;
-      transform: rotate(35deg) scaleX(-1);
-    }
-
-    /* Gathering into bouquet: gracefully float into center */
-    .garden-bloom.gathering {
-      animation: none !important;
-      transition: all 1.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
-      transform: translate(var(--fly-x, 0px), var(--fly-y, -140px)) scale(0.25) rotate(var(--fly-rot, 15deg)) !important;
-      opacity: 0 !important;
-      filter: drop-shadow(0 0 35px #ffd700) brightness(1.5) !important;
-    }
-
-    @media (max-width: 480px) {
-      #enchantedGardenMeadow {
-        max-width: 100%;
-        height: 255px;
-        margin-top: 5px;
-      }
-      .bloom-head {
-        border-width: 1.5px;
-      }
-      #bloom0 .bloom-head { width: 70px !important; height: 70px !important; }
-      #bloom0 .bloom-stem { height: 80px !important; }
-      
-      #bloom1 .bloom-head { width: 78px !important; height: 78px !important; }
-      #bloom1 .bloom-stem { height: 60px !important; }
-      
-      #bloom2 .bloom-head { width: 84px !important; height: 84px !important; }
-      #bloom2 .bloom-stem { height: 88px !important; }
-      
-      #bloom3 .bloom-head { width: 92px !important; height: 92px !important; }
-      #bloom3 .bloom-stem { height: 42px !important; }
-      
-      #bloom4 .bloom-head { width: 80px !important; height: 80px !important; }
-      #bloom4 .bloom-stem { height: 78px !important; }
-      
-      #bloom5 .bloom-head { width: 70px !important; height: 70px !important; }
-      #bloom5 .bloom-stem { height: 48px !important; }
-      
-      #bloom6 .bloom-head { width: 64px !important; height: 64px !important; }
-      #bloom6 .bloom-stem { height: 45px !important; }
+    @keyframes pulseStart {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); box-shadow: 0 0 45px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 45, 117, 0.8); }
     }
 
     /* ========================================================
-       STAGE 2: THE LUXURY FLORIST BOUQUET PRESENTATION
+       STAGE 1 & 2: CINEMATIC STORY CAPTION BOX
+       ======================================================== */
+    .story-caption-overlay {
+      position: absolute;
+      top: 14%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 580px;
+      text-align: center;
+      z-index: 25;
+      pointer-events: none;
+      transition: all 0.8s ease;
+    }
+
+    .story-title-luxury {
+      font-family: var(--font-royal);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .story-desc-luxury {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 15.5px;
+      color: #ffe4ee;
+      line-height: 1.6;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
+      padding: 0 10px;
+    }
+
+    /* 3D Garden Touch Hint */
+    .garden-3d-hint {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: rgba(255, 230, 240, 0.8);
+      background: rgba(20, 6, 30, 0.55);
+      border: 1px solid rgba(255, 215, 0, 0.25);
+      padding: 6px 18px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      z-index: 25;
+      pointer-events: none;
+      display: none;
+      animation: fadeInOut 2.5s infinite;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* ========================================================
+       STAGE 3: THE LUXURY FLORIST BOUQUET PRESENTATION
        ======================================================== */
     #stageBouquetReveal {
       position: absolute;
@@ -479,9 +363,10 @@
       justify-content: center;
       z-index: 30;
       opacity: 0;
-      transform: scale(0.9);
+      transform: scale(0.92);
       transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
       padding: 16px;
+      pointer-events: auto;
     }
 
     #stageBouquetReveal.active {
@@ -490,105 +375,119 @@
       transform: scale(1);
     }
 
-    .bouquet-arched-frame {
+    .bouquet-3d-showcase {
       position: relative;
       width: 320px;
       height: 420px;
-      border-radius: 200px 200px 40px 40px;
-      background: radial-gradient(circle at 50% 40%, rgba(255, 182, 193, 0.15) 0%, rgba(20, 6, 30, 0.8) 100%);
-      border: 2px solid rgba(246, 211, 101, 0.45);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 50px rgba(255, 107, 157, 0.4);
+      border-radius: 36px 36px 20px 20px;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      animation: floatHero 4s ease-in-out infinite alternate;
+      border: 2px solid rgba(255, 215, 0, 0.55);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 60px rgba(255, 45, 117, 0.65), 0 0 100px rgba(255, 215, 0, 0.35);
+      margin-bottom: 22px;
+      cursor: pointer;
+      animation: floatBouquet 4.5s ease-in-out infinite alternate;
+      background: radial-gradient(circle at 50% 30%, rgba(255, 200, 220, 0.15) 0%, rgba(15, 3, 22, 0.95) 100%);
     }
 
-    .bouquet-photo-img {
+    @keyframes floatBouquet {
+      0% { transform: translateY(0) rotate(-1deg); }
+      100% { transform: translateY(-14px) rotate(1.5deg); }
+    }
+
+    .bouquet-3d-showcase img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center top;
-      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+      transform: scale(1.05);
+      transition: transform 0.6s ease;
     }
 
-    /* Tucked Envelope inside Bouquet */
-    .tucked-bouquet-letter {
+    .bouquet-3d-showcase:hover img {
+      transform: scale(1.12);
+    }
+
+    /* Tucked Wax-Sealed Envelope */
+    .tucked-wax-envelope {
       position: absolute;
-      top: 140px;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
       width: 160px;
-      height: 100px;
-      background: linear-gradient(135deg, #fffdfa 0%, #ffeedb 100%);
-      border: 2px solid #e09f58;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(246, 211, 101, 0.7);
-      cursor: pointer;
+      height: 95px;
+      background: linear-gradient(135deg, #fff9f0 0%, #f7e6d2 100%);
+      border-radius: 8px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 215, 0, 0.5);
+      border: 1.5px solid #d4af37;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 35;
-      transform: rotate(-6deg);
-      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      transition: all 0.4s ease;
+      z-index: 10;
     }
 
-    .tucked-bouquet-letter:hover {
-      transform: rotate(0deg) scale(1.1);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 107, 157, 0.9);
+    .tucked-wax-envelope:hover, .tucked-wax-envelope:active {
+      transform: translateX(-50%) scale(1.1);
+      box-shadow: 0 15px 40px rgba(255, 215, 0, 0.8);
     }
 
-    .wax-seal-badge {
-      width: 38px;
-      height: 38px;
+    .wax-seal-stamp {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #ff4081 0%, #b71c1c 100%);
-      border: 2px solid #ffd700;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      background: radial-gradient(circle at 35% 35%, #ff2d55 0%, #a00b2e 80%, #600018 100%);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 215, 0, 0.6);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #ffd700;
       font-size: 16px;
+      margin-bottom: 4px;
     }
 
-    .tucked-tag-label {
-      font-size: 11px;
-      font-weight: 800;
-      color: #6d330c;
-      margin-top: 6px;
+    .envelope-stamp-text {
+      font-family: var(--font-royal);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #6d4c1b;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
-    .open-letter-action-btn {
-      margin-top: 22px;
+    .open-letter-callout-btn {
       padding: 13px 32px;
       border-radius: 30px;
-      background: linear-gradient(135deg, #ff6b9d 0%, #c41e5e 100%);
-      color: #fff;
-      font-weight: 700;
-      font-size: 15px;
-      letter-spacing: 0.5px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 6px 25px rgba(255, 107, 157, 0.6);
+      background: var(--gold-gradient);
+      border: 1px solid #fff;
+      color: #3d2600;
+      font-family: var(--font-royal);
+      font-size: 13.5px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 25px rgba(255, 215, 0, 0.6);
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 8px;
-      animation: pulseBtn 1.8s infinite;
       transition: all 0.3s ease;
-      z-index: 40;
+      animation: pulseOpenBtn 2.2s infinite;
     }
 
-    .open-letter-action-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 35px rgba(255, 107, 157, 0.9);
+    .open-letter-callout-btn:hover, .open-letter-callout-btn:active {
+      transform: scale(1.08);
+      box-shadow: 0 0 40px rgba(255, 215, 0, 0.95);
+    }
+
+    @keyframes pulseOpenBtn {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); box-shadow: 0 0 35px rgba(255, 215, 0, 0.85); }
     }
 
     /* ========================================================
-       STAGE 3: THE PERFECTLY FITTED LETTER (NO SCROLL)
+       STAGE 4: VIP FROSTED GLASS LETTER CARD
        ======================================================== */
     #stageLetterView {
       position: absolute;
@@ -599,163 +498,120 @@
       justify-content: center;
       z-index: 35;
       opacity: 0;
-      transform: translateY(20px) scale(0.96);
-      transition: all 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transform: scale(0.9);
+      transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
       padding: 16px;
+      pointer-events: auto;
     }
 
     #stageLetterView.active {
       display: flex;
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: scale(1);
     }
 
-    .letter-parchment-card {
+    .luxury-glass-parchment {
       width: 100%;
       max-width: 540px;
-      background: var(--glass-bg);
-      border: 1.5px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 24px 26px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(255, 107, 157, 0.25);
+      max-height: 85vh;
+      background: rgba(18, 6, 28, 0.82);
+      border: 1.5px solid rgba(255, 215, 0, 0.45);
+      border-radius: 28px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85), 0 0 45px rgba(255, 45, 117, 0.35);
       backdrop-filter: blur(25px);
       -webkit-backdrop-filter: blur(25px);
-      position: relative;
+      padding: 30px 28px;
       display: flex;
       flex-direction: column;
-      max-height: calc(100vh - 40px);
+      justify-content: space-between;
       overflow-y: auto;
-      scrollbar-width: none;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
     }
 
-    .letter-parchment-card::-webkit-scrollbar {
-      display: none;
+    .parchment-gold-crest {
+      text-align: center;
+      margin-bottom: 14px;
     }
 
-    .letter-parchment-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #ff6b9d, #f6d365, #ff6b9d);
-    }
-
-    .letter-top-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      border-bottom: 1px dashed rgba(255, 182, 193, 0.25);
-      padding-bottom: 8px;
-    }
-
-    .letter-badge {
-      font-size: 12px;
-      font-weight: 700;
-      color: #f6d365;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .letter-date {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.6);
-      font-weight: 500;
-    }
-
-    .letter-salutation {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      font-weight: 700;
-      color: #ffd1dc;
-      margin-bottom: 12px;
-      letter-spacing: 0.5px;
-    }
-
-    .letter-content-text {
-      font-family: 'Playfair Display', serif;
-      font-size: 15.5px;
-      line-height: 1.8;
-      color: #fff0f6;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-      margin-bottom: 16px;
-      white-space: pre-line;
-    }
-
-    .letter-signature {
-      font-family: 'Dancing Script', cursive;
-      font-size: 22px;
-      color: #f6d365;
-      text-align: right;
-      margin-bottom: 16px;
-    }
-
-    .mystery-box-section {
-      background: linear-gradient(135deg, rgba(255, 71, 133, 0.2) 0%, rgba(246, 211, 101, 0.2) 100%);
-      border: 1.5px dashed #ffd700;
-      border-radius: 14px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .mystery-box-section:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 25px rgba(246, 211, 101, 0.5);
-      background: linear-gradient(135deg, rgba(255, 71, 133, 0.3) 0%, rgba(246, 211, 101, 0.3) 100%);
-    }
-
-    .mystery-info {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .mystery-tag {
+    .parchment-gold-crest span {
+      font-family: var(--font-royal);
       font-size: 11px;
-      font-weight: 800;
-      color: #ffd700;
+      letter-spacing: 4px;
+      color: var(--gold-primary);
       text-transform: uppercase;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
     }
 
-    .mystery-desc {
-      font-size: 13px;
-      color: #fff;
-      font-weight: 500;
-    }
-
-    .gift-btn {
-      padding: 9px 18px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-      color: #2b0b3a;
+    .letter-salutation-text {
+      font-family: var(--font-royal);
+      font-size: 20px;
       font-weight: 800;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .letter-body-message {
+      font-family: var(--font-serif);
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: #ffeef4;
+      margin-bottom: 20px;
+      white-space: pre-line;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+      min-height: 140px;
+    }
+
+    .letter-signature-text {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 15px;
+      color: #ffd700;
+      text-align: right;
+      margin-bottom: 20px;
+      padding-right: 6px;
+    }
+
+    /* 3D Luxury Mystery Gift Button */
+    .mystery-gift-vip-btn {
+      align-self: center;
+      width: 100%;
+      max-width: 320px;
+      padding: 14px 24px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #ffd700 0%, #ff8c00 50%, #ff007f 100%);
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 0 35px rgba(255, 215, 0, 0.7), 0 8px 30px rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-family: var(--font-royal);
       font-size: 13px;
-      border: none;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(246, 211, 101, 0.6);
       display: flex;
       align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      animation: pulseBtn 1.8s infinite;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.35s ease;
+      animation: pulseGiftBox 2s infinite;
+    }
+
+    .mystery-gift-vip-btn:hover, .mystery-gift-vip-btn:active {
+      transform: scale(1.05);
+      box-shadow: 0 0 50px rgba(255, 215, 0, 0.95), 0 0 70px rgba(255, 0, 128, 0.85);
+    }
+
+    @keyframes pulseGiftBox {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); box-shadow: 0 0 45px rgba(255, 215, 0, 0.9), 0 0 60px rgba(255, 0, 128, 0.7); }
     }
 
     /* ========================================================
-       STAGE 4: GRAND FINALE - VIDEO TWIST (KHÁ BẢNH)
+       STAGE 5: KHÁ BẢNH GRAND FINALE CELEBRATION
        ======================================================== */
     #stageFinale {
       position: absolute;
@@ -766,9 +622,10 @@
       justify-content: center;
       z-index: 40;
       opacity: 0;
-      transform: scale(0.9);
-      transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transform: scale(0.92);
+      transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
       padding: 16px;
+      pointer-events: auto;
     }
 
     #stageFinale.active {
@@ -777,188 +634,189 @@
       transform: scale(1);
     }
 
-    .vip-stage-box {
+    .finale-box-frame {
       width: 100%;
-      max-width: 550px;
-      background: rgba(18, 6, 29, 0.94);
-      border: 2px solid transparent;
-      border-image: linear-gradient(135deg, #ffd700, #ff007f, #00f0ff, #ffd700) 1;
-      border-radius: 22px;
-      padding: 16px;
-      box-shadow: 0 0 50px rgba(255, 0, 128, 0.5), 0 0 80px rgba(255, 215, 0, 0.3);
+      max-width: 500px;
+      background: rgba(15, 4, 24, 0.85);
+      border: 2px solid rgba(255, 215, 0, 0.55);
+      border-radius: 28px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 60px rgba(255, 0, 128, 0.6);
+      backdrop-filter: blur(25px);
+      padding: 24px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
+    /* Neon Marquee */
     .neon-marquee-container {
       width: 100%;
       overflow: hidden;
       white-space: nowrap;
-      padding: 7px 0;
-      margin-bottom: 12px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 16px;
+      border-top: 1px solid rgba(255, 215, 0, 0.4);
+      border-bottom: 1px solid rgba(255, 215, 0, 0.4);
+      padding: 8px 0;
+      background: rgba(255, 215, 0, 0.08);
     }
 
     .neon-marquee-text {
       display: inline-block;
-      font-weight: 800;
-      font-size: 13px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      animation: marqueeScroll 11s linear infinite;
+      font-family: var(--font-royal);
+      font-weight: 900;
+      font-size: 14px;
       color: #ffd700;
-      text-shadow: 0 0 10px #ffd700, 0 0 20px #ff007f;
-      animation: marquee 12s linear infinite;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px #ff007f, 0 0 20px #ffd700;
     }
 
-    @keyframes marquee {
+    @keyframes marqueeScroll {
       0% { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
     }
 
-    .video-viewport {
+    /* Video Player Viewport */
+    .video-viewport-3d {
       width: 100%;
-      aspect-ratio: 107 / 96;
-      max-height: 380px;
-      background: #000;
-      border-radius: 16px;
+      max-width: 420px;
+      aspect-ratio: 9/16;
+      max-height: 52vh;
+      border-radius: 20px;
       overflow: hidden;
       position: relative;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 107, 157, 0.3);
+      border: 2px solid rgba(255, 215, 0, 0.65);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.5);
+      background: #000;
+      margin-bottom: 16px;
       cursor: pointer;
     }
 
-    video#bnhVideo {
+    .video-viewport-3d video {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
     }
 
-    .video-play-hint {
+    .video-play-tap-hint {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.55);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      gap: 12px;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-      z-index: 5;
     }
 
-    .video-play-hint.visible {
+    .video-play-tap-hint.visible {
       opacity: 1;
       pointer-events: auto;
     }
 
-    .play-circle-btn {
+    .play-circle-gold {
       width: 64px;
       height: 64px;
       border-radius: 50%;
-      background: #ff007f;
+      background: var(--gold-gradient);
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 30px #ff007f;
-      margin-bottom: 8px;
+      color: #000;
     }
 
-    .play-circle-btn svg {
+    .play-circle-gold svg {
       width: 28px;
       height: 28px;
-      fill: #fff;
-      margin-left: 3px;
+      fill: currentColor;
+      margin-left: 4px;
     }
 
     .viral-quote-banner {
-      margin-top: 12px;
-      text-align: center;
+      font-family: var(--font-serif);
+      font-style: italic;
       font-size: 14.5px;
-      font-weight: 700;
-      line-height: 1.4;
-      background: linear-gradient(90deg, #ff6b9d, #ffd700, #ff6b9d);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 15px rgba(255, 107, 157, 0.5);
+      color: #ffe4f0;
+      text-align: center;
+      margin-bottom: 18px;
+      padding: 0 12px;
+      line-height: 1.5;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
     }
 
-    .finale-actions {
+    .finale-actions-row {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 10px;
       width: 100%;
-      margin-top: 14px;
-      justify-content: center;
     }
 
-    .action-pill-btn {
-      padding: 9px 18px;
-      border-radius: 30px;
+    .vip-action-pill {
+      padding: 10px 18px;
+      border-radius: 25px;
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 215, 0, 0.35);
       color: #fff;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
       transition: all 0.3s ease;
     }
 
-    .action-pill-btn:hover {
-      background: rgba(255, 255, 255, 0.18);
+    .vip-action-pill.primary {
+      background: linear-gradient(135deg, rgba(255, 45, 117, 0.85), rgba(255, 215, 0, 0.85));
+      border-color: #fff;
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 0 20px rgba(255, 45, 117, 0.6);
+    }
+
+    .vip-action-pill:hover, .vip-action-pill:active {
       transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(255, 215, 0, 0.5);
+      border-color: #ffd700;
+      color: #ffd700;
     }
 
-    .action-pill-btn.primary {
-      background: linear-gradient(135deg, #ff4785 0%, #ff007f 100%);
-      border: none;
-      box-shadow: 0 4px 15px rgba(255, 0, 128, 0.4);
-    }
-
-    /* Keyframes */
-    @keyframes breatheGlow {
-      0% { transform: scale(0.96); box-shadow: 0 0 35px rgba(255, 107, 157, 0.6); }
-      100% { transform: scale(1.06); box-shadow: 0 0 65px rgba(255, 107, 157, 1), 0 0 90px rgba(246, 211, 101, 0.7); }
-    }
-
-    @keyframes floatHero {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-12px); }
-    }
-
-    @keyframes pulseBtn {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.06); box-shadow: 0 4px 25px rgba(255, 215, 0, 0.8); }
-    }
-
+    /* Mobile Responsive Optimizations */
     @media (max-width: 600px) {
-      .intro-title { font-size: 24px; }
-      #singleHeroFlower { width: 180px; height: 180px; }
-      .bouquet-arched-frame { width: 280px; height: 380px; }
-      .story-caption-title { font-size: 20px; }
-      .letter-salutation { font-size: 17.5px; }
-      .letter-content-text { font-size: 14px; line-height: 1.65; }
+      .intro-royal-title { font-size: 24px; }
+      .intro-poetic-sub { font-size: 14px; margin-bottom: 24px; }
+      .bouquet-3d-showcase { width: 270px; height: 360px; }
+      .story-title-luxury { font-size: 20px; }
+      .story-desc-luxury { font-size: 14px; }
+      .luxury-glass-parchment { padding: 22px 18px; }
+      .letter-salutation-text { font-size: 17.5px; }
+      .letter-body-message { font-size: 14px; line-height: 1.65; }
     }
   </style>
 </head>
 <body>
 
-  <div class="garden-bg-image"></div>
-  <div class="ambient-bg" id="ambientBg"></div>
-  <canvas id="bgCanvas"></canvas>
-  <canvas id="confettiCanvas"></canvas>
-  <audio id="bgAudio" src="bg_music.mp3" loop preload="auto"></audio>
+  <!-- WebGL 3D Canvas -->
+  <canvas id="webglCanvas"></canvas>
 
-  <div class="sound-btn-box">
-    <button class="glass-btn-icon" id="soundToggleBtn" onclick="toggleSound(event)" title="Bật/Tắt Nhạc Nền">
+  <!-- 2D Confetti Layer -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Ambient Cinematic Lighting Layer -->
+  <div class="ambient-lighting" id="ambientLight"></div>
+
+  <!-- Audio Element -->
+  <audio id="bgAudio" src="bg_music.mp3" loop preload="auto" playsinline webkit-playsinline></audio>
+
+  <!-- Sound Toggle -->
+  <div class="sound-control-box">
+    <button class="luxury-icon-btn" id="soundToggleBtn" onclick="toggleSound(event)" title="Bật/Tắt Nhạc Nền">
       <svg id="musicIconOn" viewBox="0 0 24 24">
         <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
       </svg>
@@ -968,215 +826,89 @@
     </button>
   </div>
 
+  <!-- Navigation Pills -->
+  <div class="vip-category-nav">
+    <a href="index.html" class="cat-nav-pill ">🌹 Cho Em</a>
+    <a href="me.html" class="cat-nav-pill ">💐 Cho Mẹ</a>
+    <a href="dongnghiep.html" class="cat-nav-pill active">🌺 Đồng Nghiệp</a>
+  </div>
+
+  <!-- Main Viewport Layer -->
   <div class="app-viewport">
 
-    <!-- ========================================================
-         STAGE 0: GENTLE TOUCH TO BEGIN
-         ======================================================== -->
-    <div id="stageIntro" onclick="handleStart(event)">
-      <div class="intro-flower-icon">
-        <img src="images/rose.jpg" alt="Hoa Hồng Tuyệt Mỹ">
+    <!-- STAGE 0: INTRO SCREEN -->
+    <div id="stageIntro" class="interactive-layer" onclick="handleStart(event)">
+      <div class="intro-crystal-seal">
+        <img src="images/rose.jpg" alt="Đóa Hoa Độc Bản">
       </div>
-      <h1 class="intro-title">Chào Ngày Phụ Nữ Việt Nam</h1>
-      <p class="intro-sub">Chạm nhẹ để bắt đầu hành trình kỳ diệu dệt nên bó hoa dành tặng bạn ✨</p>
-      <button class="tap-start-btn" id="tapStartBtn" onclick="handleStart(event)">
+      <div class="royal-badge">20 • 10 • CELEBRATION</div>
+      <h1 class="intro-royal-title">Chào Ngày Phụ Nữ Việt Nam</h1>
+      <p class="intro-poetic-sub">Chạm nhẹ để bắt đầu hành trình 3D kỳ diệu dệt nên bó hoa trao tặng bạn ✨</p>
+      <button class="vip-start-btn" id="tapStartBtn" onclick="handleStart(event)">
         <span>Bắt Đầu Hành Trình 🌸</span>
       </button>
     </div>
 
-    <!-- ========================================================
-         STAGE 1: CINEMATIC BLOOM & ENCHANTED GARDEN
-         ======================================================== -->
-    <div id="stageGardenCinematic">
-      
-      <div class="story-caption-box">
-        <div class="story-caption-title" id="storyTitle">Đóa Hoa Đầu Tiên</div>
-        <div class="story-caption-desc" id="storyDesc">“Mỗi người phụ nữ là một đóa hoa độc bản, mang ánh sáng dịu dàng sưởi ấm thế gian...”</div>
-      </div>
-
-      <!-- Hero Single Rose -->
-      <div id="singleHeroFlower">
-        <img src="images/rose.jpg" alt="Đóa Hoa Độc Bản">
-      </div>
-
-      <!-- The Real Living Enchanted Garden Meadow -->
-      <div id="enchantedGardenMeadow">
-        <div class="garden-terrain-bed"></div>
-        <div class="garden-grass-fringe"></div>
-
-        <!-- Flower 0: Pink Tulip (Left Background) -->
-        <div class="garden-bloom sway-1" id="bloom0" style="left: 6%; bottom: 26px; z-index: 2; --fly-x: 140px; --fly-y: -140px; --fly-rot: -20deg; --glow: rgba(255, 130, 180, 0.6);">
-          <div class="bloom-head" style="width: 86px; height: 86px;">
-            <img src="images/tulip.jpg" alt="Hoa Tulip Hồng">
-            <div class="dew-sparkle"></div>
-          </div>
-          <div class="bloom-stem" style="height: 100px;">
-            <div class="bloom-leaf left"></div>
-            <div class="bloom-leaf right"></div>
-          </div>
-        </div>
-
-        <!-- Flower 1: Crimson Velvet Rose (Left Midground) -->
-        <div class="garden-bloom sway-2" id="bloom1" style="left: 19%; bottom: 14px; z-index: 4; --fly-x: 90px; --fly-y: -130px; --fly-rot: -10deg; --glow: rgba(255, 40, 90, 0.7);">
-          <div class="bloom-head" style="width: 96px; height: 96px;">
-            <img src="images/rose.jpg" alt="Hoa Hồng Nhung">
-            <div class="dew-sparkle"></div>
-          </div>
-          <div class="bloom-stem" style="height: 75px;">
-            <div class="bloom-leaf left"></div>
-          </div>
-        </div>
-
-        <!-- Flower 2: Golden Sunflower (Center Background - Tallest) -->
-        <div class="garden-bloom sway-3" id="bloom2" style="left: 34%; bottom: 32px; z-index: 2; --fly-x: 30px; --fly-y: -150px; --fly-rot: 5deg; --glow: rgba(250, 204, 21, 0.7);">
-          <div class="bloom-head" style="width: 104px; height: 104px;">
-            <img src="images/sunflower.jpg" alt="Hoa Hướng Dương">
-            <div class="dew-sparkle"></div>
-          </div>
-          <div class="bloom-stem" style="height: 110px;">
-            <div class="bloom-leaf left"></div>
-            <div class="bloom-leaf right"></div>
-          </div>
-        </div>
-
-        <!-- Flower 3: Lush Pink Peony (Center Foreground - Star Bloom) -->
-        <div class="garden-bloom sway-4" id="bloom3" style="left: 47%; bottom: 6px; z-index: 6; --fly-x: -15px; --fly-y: -125px; --fly-rot: -5deg; --glow: rgba(244, 114, 182, 0.75);">
-          <div class="bloom-head" style="width: 114px; height: 114px;">
-            <img src="images/peony.jpg" alt="Hoa Mẫu Đơn">
-            <div class="dew-sparkle"></div>
-          </div>
-          <div class="bloom-stem" style="height: 52px;">
-            <div class="bloom-leaf left"></div>
-            <div class="bloom-leaf right"></div>
-          </div>
-        </div>
-
-        <!-- Flower 4: Ruby Rose (Right Background) -->
-        <div class="garden-bloom sway-1" id="bloom4" style="left: 62%; bottom: 28px; z-index: 3; --fly-x: -80px; --fly-y: -145px; --fly-rot: 15deg; --glow: rgba(255, 60, 110, 0.65);">
-          <div class="bloom-head" style="width: 98px; height: 98px;">
-            <img src="images/rose.jpg" alt="Hoa Hồng Đỏ">
-            <div class="dew-sparkle"></div>
-          </div>
-          <div class="bloom-stem" style="height: 98px;">
-            <div class="bloom-leaf right"></div>
-          </div>
-        </div>
-
-        <!-- Flower 5: Daisy / Cúc Họa Mi (Right Foreground) -->
-        <div class="garden-bloom sway-2" id="bloom5" style="left: 75%; bottom: 12px; z-index: 5; --fly-x: -130px; --fly-y: -120px; --fly-rot: 20deg; --glow: rgba(254, 240, 138, 0.7);">
-          <div class="bloom-head" style="width: 86px; height: 86px;">
-            <img src="images/daisy.jpg" alt="Cúc Họa Mi">
-            <div class="dew-sparkle"></div>
-          </div>
-          <div class="bloom-stem" style="height: 60px;">
-            <div class="bloom-leaf left"></div>
-          </div>
-        </div>
-
-        <!-- Flower 6: Graceful Tulip Bud (Far Left Foreground) -->
-        <div class="garden-bloom sway-3" id="bloom6" style="left: -1%; bottom: 8px; z-index: 5; --fly-x: 180px; --fly-y: -115px; --fly-rot: -25deg; --glow: rgba(244, 114, 182, 0.65);">
-          <div class="bloom-head" style="width: 80px; height: 80px;">
-            <img src="images/tulip.jpg" alt="Nụ Tulip">
-            <div class="dew-sparkle"></div>
-          </div>
-          <div class="bloom-stem" style="height: 56px;">
-            <div class="bloom-leaf right"></div>
-          </div>
-        </div>
-
-      </div>
-
+    <!-- STAGES 1 & 2: STORY CAPTION OVERLAY -->
+    <div class="story-caption-overlay" id="storyCaptionBox" style="display: none;">
+      <div class="story-title-luxury" id="storyTitle">Đóa Hoa Đầu Tiên</div>
+      <div class="story-desc-luxury" id="storyDesc">“Mỗi người phụ nữ là một đóa hoa độc bản, mang ánh sáng dịu dàng sưởi ấm thế gian...”</div>
     </div>
 
-    <!-- ========================================================
-         STAGE 2: THE LUXURY FLORIST BOUQUET
-         ======================================================== -->
-    <div id="stageBouquetReveal">
-      
-      <div class="bouquet-arched-frame">
-        <img class="bouquet-photo-img" src="images/bouquet.jpg" alt="Bó Hoa Tuyệt Mỹ 20/10">
-        
-        <!-- Tucked letter in bouquet -->
-        <div class="tucked-bouquet-letter" id="tuckedLetter" onclick="openLetterCard(event)">
-          <div class="wax-seal-badge">★</div>
-          <span class="tucked-tag-label">Mở Bức Thư 💌</span>
+    <!-- 3D Garden Interaction Touch Hint -->
+    <div class="garden-3d-hint" id="gardenHint">✨ Chạm vào hoa trong vườn để xem vũ điệu cánh hoa ✨</div>
+
+    <!-- STAGE 3: BOUQUET REVEAL -->
+    <div id="stageBouquetReveal" class="interactive-layer">
+      <div class="bouquet-3d-showcase" id="bouquetContainer" onclick="openLetterCard(event)">
+        <img src="images/bouquet.jpg" alt="Bó Hoa Trao Tặng">
+        <div class="tucked-wax-envelope" id="tuckedLetter" onclick="openLetterCard(event)">
+          <div class="wax-seal-stamp">★</div>
+          <span class="envelope-stamp-text">THƯ TẶNG NÀNG</span>
         </div>
       </div>
-
-      <button class="open-letter-action-btn" id="btnOpenLetter" onclick="openLetterCard(event)">
-        <span>Mở Bức Thư Chúc Mừng 20/10 💌</span>
+      <button class="open-letter-callout-btn" id="btnOpenLetter" onclick="openLetterCard(event)">
+        <span>💌 Mở Bức Thư Trao Nàng ✨</span>
       </button>
-
     </div>
 
-    <!-- ========================================================
-         STAGE 3: THE PERFECTLY FITTED LETTER (NO SCROLL)
-         ======================================================== -->
-    <div id="stageLetterView">
-      <div class="letter-parchment-card">
-        
-        <div class="letter-top-row">
-          <div class="letter-badge">
-            <span>💌</span> THƯ CHÚC MỪNG 20/10
-          </div>
-          <div class="letter-date">20 Tháng 10, 2026</div>
+    <!-- STAGE 4: VIP FROSTED GLASS LETTER CARD -->
+    <div id="stageLetterView" class="interactive-layer">
+      <div class="luxury-glass-parchment" id="letterCard">
+        <div class="parchment-gold-crest">
+          <span>★ 20 • 10 • DÀNH TẶNG NÀNG ★</span>
         </div>
-
-        <div class="letter-salutation" id="letterRecipientHeader">
-          Gửi tới những người phụ nữ tuyệt vời, bản lĩnh và rực rỡ! 👑
+        <div class="letter-salutation-text" id="letterRecipientHeader">
+          Chúc mừng ngày Phụ nữ Việt Nam 20/10 tới toàn thể chị em! 🌺
         </div>
-
-        <div class="letter-content-text" id="letterTextBody">
-          Nhân ngày Phụ nữ Việt Nam 20/10, chúc bạn một ngày ngập tràn niềm vui, công việc thăng hoa, tài lộc dồi dào và nhan sắc ngày càng thăng hạng!
-
-          Cảm ơn bạn vì đã luôn là người đồng hành tuyệt vời, mang đến nguồn năng lượng tích cực, sự thông minh và nụ cười rạng ngời cho mọi người xung quanh. Bó hoa tươi thắm này thay cho những lời chúc chân thành và rực rỡ nhất gửi đến bạn.
-
-          Chúc bạn luôn tự tin, kiêu hãnh và luôn là phiên bản tỏa sáng, hạnh phúc nhất của chính mình! ✨
+        <div class="letter-body-message" id="letterTextBody"></div>
+        <div class="letter-signature-text" id="letterSignature">
+          ~ Thân gửi từ đồng đội & các anh em ~
         </div>
-
-        <div class="letter-signature">
-          ~ Chúc mừng ngày 20/10 rực rỡ! ~
-        </div>
-
-        <!-- The Mystery Gift Trigger (Khá Bảnh Climax) -->
-        <div class="mystery-box-section" id="btnMysteryGift" onclick="triggerMysteryGift(event)">
-          <div class="mystery-info">
-            <span class="mystery-tag">
-              <span>🎁</span> MÓN QUÀ BẤT NGỜ TỪ ĐẠI SỨ ĐẶC BIỆT
-            </span>
-            <span class="mystery-desc">Có một thông điệp năng lượng tối thượng gửi riêng cho bạn!</span>
-          </div>
-          <button class="gift-btn">
-            <span>Mở Quà ⚡</span>
-          </button>
-        </div>
-
+        <button class="mystery-gift-vip-btn" id="btnMysteryGift" onclick="triggerMysteryGift(event)">
+          <span>🎁 MỞ HỘP QUÀ BÍ MẬT 20/10 ✨</span>
+        </button>
       </div>
     </div>
 
-    <!-- ========================================================
-         STAGE 4: GRAND FINALE / VIRAL VIDEO TWIST
-         ======================================================== -->
-    <div id="stageFinale">
-      <div class="vip-stage-box">
-        
+    <!-- STAGE 5: KHÁ BẢNH GRAND FINALE -->
+    <div id="stageFinale" class="interactive-layer">
+      <div class="finale-box-frame">
         <div class="neon-marquee-container">
           <div class="neon-marquee-text">
             ★ CHÚC CHỊ EM 20/10 VUI VẺ ★ RỰC RỠ XINH GÁI ★ HẠNH PHÚC RẤT CHI LÀ HẠNH PHÚC NHÁ ★
           </div>
         </div>
 
-        <div class="video-viewport" id="videoContainer" onclick="toggleVideoPlay(event)">
+        <div class="video-viewport-3d" id="videoContainer" onclick="toggleVideoPlay(event)">
           <video id="bnhVideo" playsinline webkit-playsinline x5-playsinline preload="auto">
             <source src="video.mp4" type="video/mp4">
-            Trình duyệt không hỗ trợ thẻ video.
           </video>
-          
-          <div class="video-play-hint" id="videoPlayHint">
-            <div class="play-circle-btn">
+          <div class="video-play-tap-hint" id="videoPlayHint">
+            <div class="play-circle-gold">
               <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
             </div>
-            <span style="font-weight: 700; font-size: 15px;">Bấm để xem Đại Sứ chúc mừng!</span>
+            <span style="font-weight: 700; font-size: 14px;">Bấm để xem Đại Sứ chúc mừng!</span>
           </div>
         </div>
 
@@ -1184,21 +916,20 @@
           “Chị em nào cũng rực rỡ xinh gái & luôn hạnh phúc rất chi là hạnh phúc nhá!”
         </div>
 
-        <div class="finale-actions">
-          <button class="action-pill-btn primary" id="btnFlowerRain" onclick="triggerFlowerRain(event)">
-            <span>🌸</span> Rắc Mưa Hoa
+        <div class="finale-actions-row">
+          <button class="vip-action-pill primary" onclick="triggerFlowerRain(event)">
+            <span>🌸</span> Rắc Mưa Hoa 3D
           </button>
-          <button class="action-pill-btn" id="btnReplayVideo" onclick="replayVideo(event)">
+          <button class="vip-action-pill" onclick="replayVideo(event)">
             <span>▶️</span> Phát Lại Video
           </button>
-          <button class="action-pill-btn" id="btnBackToLetter" onclick="backToLetter(event)">
+          <button class="vip-action-pill" onclick="backToLetter(event)">
             <span>💌</span> Xem Lại Thư
           </button>
-          <button class="action-pill-btn" id="btnReplayAll" onclick="replayAll(event)">
+          <button class="vip-action-pill" onclick="replayAll(event)">
             <span>✨</span> Xem Từ Đầu
           </button>
         </div>
-
       </div>
     </div>
 
@@ -1208,7 +939,7 @@
     /* =========================================================
        1. WEB AUDIO SYNTHESIZER
        ========================================================= */
-        class SoundEngine {
+    class SoundEngine {
       constructor() {
         this.ctx = null;
         this.masterGain = null;
@@ -1219,9 +950,9 @@
       init() {
         try {
           if (!this.ctx) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (AudioContext) {
-              this.ctx = new AudioContext();
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) {
+              this.ctx = new AudioCtx();
               this.masterGain = this.ctx.createGain();
               this.masterGain.gain.setValueAtTime(0.35, this.ctx.currentTime);
               this.masterGain.connect(this.ctx.destination);
@@ -1253,13 +984,11 @@
         }
       }
 
-      // 1. TYPEWRITER / KEYSTROKE CLICK (Soft vintage key tap)
       playTypewriterClick(isSpace = false) {
         try {
           this.init();
           if (!this.ctx || this.isMuted) return;
           const now = this.ctx.currentTime;
-
           if (this.noiseBuffer) {
             const noise = this.ctx.createBufferSource();
             noise.buffer = this.noiseBuffer;
@@ -1292,13 +1021,12 @@
         } catch (e) {}
       }
 
-      // 2. FLOWER PLUCK & LIFT CHIME (Sparkle pluck)
       playFlowerPluck(idx = 0) {
         try {
           this.init();
           if (!this.ctx || this.isMuted) return;
           const now = this.ctx.currentTime;
-          const notes = [523.25, 659.25, 783.99, 987.77, 1046.50, 1318.51];
+          const notes = [523.25, 659.25, 783.99, 987.77, 1046.50, 1174.66, 1318.51];
           const freq = notes[idx % notes.length];
 
           const osc = this.ctx.createOscillator();
@@ -1329,13 +1057,11 @@
         } catch (e) {}
       }
 
-      // 3. PAPER RUSTLE / SATIN RIBBON SWOOSH (Wrapping flowers)
       playWrapSwoosh() {
         try {
           this.init();
           if (!this.ctx || this.isMuted || !this.noiseBuffer) return;
           const now = this.ctx.currentTime;
-
           const noise = this.ctx.createBufferSource();
           noise.buffer = this.noiseBuffer;
 
@@ -1358,7 +1084,6 @@
         } catch (e) {}
       }
 
-      // 4. BOUQUET REVEAL CHIME CHORD
       playBouquetReveal() {
         try {
           this.init();
@@ -1383,13 +1108,11 @@
         } catch (e) {}
       }
 
-      // 5. ENVELOPE WAX SEAL POP & OPEN
       playEnvelopeOpen() {
         try {
           this.init();
           if (!this.ctx || this.isMuted) return;
           const now = this.ctx.currentTime;
-
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = 'sine';
@@ -1403,18 +1126,15 @@
           gain.connect(this.masterGain);
           osc.start(now);
           osc.stop(now + 0.1);
-
           setTimeout(() => this.playWrapSwoosh(), 70);
         } catch (e) {}
       }
 
-      // 6. CONFETTI BURST POP
       playConfettiBurst() {
         try {
           this.init();
           if (!this.ctx || this.isMuted) return;
           const now = this.ctx.currentTime;
-
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = 'sine';
@@ -1431,109 +1151,586 @@
         } catch (e) {}
       }
 
-      playTone(freq, type = 'sine', duration = 1.6, gainVal = 0.25) {
-        try {
-          this.init();
-          if (!this.ctx || this.isMuted) return;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = type;
-          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-          gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(gainVal, this.ctx.currentTime + 0.05);
-          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
-          osc.connect(gain);
-          gain.connect(this.masterGain);
-          osc.start();
-          osc.stop(this.ctx.currentTime + duration);
-        } catch (e) {}
-      }
-
       playHarpGlissando() {
         try {
           this.init();
           const notes = [440, 523.25, 659.25, 783.99, 880, 1046.50, 1318.51];
           notes.forEach((freq, idx) => {
-            setTimeout(() => this.playTone(freq, 'sine', 1.8, 0.18), idx * 75);
+            setTimeout(() => {
+              if (!this.ctx || this.isMuted) return;
+              const osc = this.ctx.createOscillator();
+              const gain = this.ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+              gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.18, this.ctx.currentTime + 0.04);
+              gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1.6);
+              osc.connect(gain);
+              gain.connect(this.masterGain);
+              osc.start();
+              osc.stop(this.ctx.currentTime + 1.65);
+            }, idx * 75);
           });
         } catch (e) {}
       }
-
-      startGentleLofiLoop() {}
-      stopLofiLoop() {}
     }
     const sound = new SoundEngine();
 
     /* =========================================================
-       2. CANVAS ENGINE: BOKEH, PETALS & CONFETTI
+       2. THREE.JS 3D CINEMATIC UNIVERSE ENGINE
        ========================================================= */
-    const bgCanvas = document.getElementById('bgCanvas');
-    const bgCtx = bgCanvas.getContext('2d');
+    let scene, camera, renderer;
+    let stardustParticles, fallingPetals = [];
+    let heroFlowerGroup, gardenMeadowGroup;
+    let fireflies = [];
+    let spotLight, interactivePointLight;
+    let targetCameraX = 0, targetCameraY = 0;
+    let currentCameraX = 0, currentCameraY = 0;
+    const raycaster = new THREE.Raycaster();
+    const mouseVector = new THREE.Vector2();
+
+    const flowerDefs = [
+      { id: 'tulip0', img: 'images/tulip.jpg', x: -4.3, y: -3.8, z: -2.5, stemH: 4.8, headSize: 2.2, glow: 0xff80bf, swaySpeed: 1.3, swayAngle: 0.045 },
+      { id: 'rose1',  img: 'images/rose.jpg',  x: -2.4, y: -3.8, z: 1.0,  stemH: 4.1, headSize: 2.4, glow: 0xff1744, swaySpeed: 1.6, swayAngle: 0.038 },
+      { id: 'sun2',   img: 'images/sunflower.jpg', x: -0.6, y: -3.8, z: -3.6, stemH: 5.6, headSize: 2.7, glow: 0xffd700, swaySpeed: 1.1, swayAngle: 0.032 },
+      { id: 'peony3', img: 'images/peony.jpg', x: 0.8,  y: -3.8, z: 2.4,  stemH: 3.7, headSize: 2.8, glow: 0xff69b4, swaySpeed: 1.4, swayAngle: 0.052 },
+      { id: 'rose4',  img: 'images/rose.jpg',  x: 2.6,  y: -3.8, z: -1.6, stemH: 4.6, headSize: 2.3, glow: 0xff2d55, swaySpeed: 1.5, swayAngle: 0.040 },
+      { id: 'daisy5', img: 'images/daisy.jpg', x: 4.1,  y: -3.8, z: 1.6,  stemH: 3.4, headSize: 2.0, glow: 0xfff59d, swaySpeed: 1.8, swayAngle: 0.048 },
+      { id: 'tulip6', img: 'images/tulip.jpg', x: -5.6, y: -3.8, z: 0.6,  stemH: 3.5, headSize: 1.9, glow: 0xf48fb1, swaySpeed: 1.7, swayAngle: 0.042 }
+    ];
+    let created3DFlowers = [];
+
+    function init3DWorld() {
+      const canvas = document.getElementById('webglCanvas');
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x08010f, 0.028);
+
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 0, window.innerWidth < 600 ? 19 : 15);
+
+      renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.18;
+
+      // 3D Lighting Setup
+      const ambientLight = new THREE.AmbientLight(0x280b3d, 1.4);
+      scene.add(ambientLight);
+
+      spotLight = new THREE.SpotLight(0xfff0d5, 2.6, 40, Math.PI / 4, 0.45);
+      spotLight.position.set(2, 12, 10);
+      scene.add(spotLight);
+
+      const rimLight = new THREE.DirectionalLight(0xff2d75, 2.2);
+      rimLight.position.set(-8, 6, -10);
+      scene.add(rimLight);
+
+      interactivePointLight = new THREE.PointLight(0xffd700, 2.2, 16);
+      interactivePointLight.position.set(0, 0, 6);
+      scene.add(interactivePointLight);
+
+      build3DStardust();
+      build3DFallingPetals();
+      build3DHeroRose();
+      build3DEnchantedMeadow();
+      build3DFireflies();
+
+      window.addEventListener('resize', onWindowResize, false);
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      window.addEventListener('deviceorientation', onDeviceOrientation, { passive: true });
+      canvas.addEventListener('click', onCanvasClick);
+
+      animate3D();
+    }
+
+    // Feathered Circular Alpha Texture Generator
+    function createFeatheredTexture(url) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      const texture = new THREE.CanvasTexture(canvas);
+      
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = url;
+      img.onload = () => {
+        ctx.clearRect(0, 0, 512, 512);
+        ctx.drawImage(img, 0, 0, 512, 512);
+        
+        // Soft organic radial feathering
+        const grad = ctx.createRadialGradient(256, 256, 175, 256, 256, 250);
+        grad.addColorStop(0, 'rgba(0, 0, 0, 1)');
+        grad.addColorStop(0.85, 'rgba(0, 0, 0, 0.95)');
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(256, 256, 252, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+        
+        texture.needsUpdate = true;
+      };
+      return texture;
+    }
+
+    // 1. Celestial Stardust Particles (1,000 points)
+    function build3DStardust() {
+      const count = 1000;
+      const geo = new THREE.BufferGeometry();
+      const pos = new Float32Array(count * 3);
+      const col = new Float32Array(count * 3);
+
+      const colorPalette = [
+        new THREE.Color('#ffd700'),
+        new THREE.Color('#ffffff'),
+        new THREE.Color('#ff69b4'),
+        new THREE.Color('#ff2d75')
+      ];
+
+      for (let i = 0; i < count; i++) {
+        pos[i * 3] = (Math.random() - 0.5) * 45;
+        pos[i * 3 + 1] = (Math.random() - 0.5) * 30;
+        pos[i * 3 + 2] = (Math.random() - 0.5) * 35;
+
+        const c = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+        col[i * 3] = c.r;
+        col[i * 3 + 1] = c.g;
+        col[i * 3 + 2] = c.b;
+      }
+
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+
+      // Circular particle point
+      const pCanvas = document.createElement('canvas');
+      pCanvas.width = 32;
+      pCanvas.height = 32;
+      const pCtx = pCanvas.getContext('2d');
+      const grad = pCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      grad.addColorStop(0.3, 'rgba(255, 235, 160, 0.8)');
+      grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      pCtx.fillStyle = grad;
+      pCtx.fillRect(0, 0, 32, 32);
+      const pTex = new THREE.CanvasTexture(pCanvas);
+
+      const mat = new THREE.PointsMaterial({
+        size: 0.35,
+        map: pTex,
+        transparent: true,
+        vertexColors: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      stardustParticles = new THREE.Points(geo, mat);
+      scene.add(stardustParticles);
+    }
+
+    // 2. 3D Tumbling Falling Petals
+    function build3DFallingPetals() {
+      const petalGeo = new THREE.PlaneGeometry(0.35, 0.45);
+      const petalMat = new THREE.MeshStandardMaterial({
+        color: 0xff3b78,
+        roughness: 0.3,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85
+      });
+
+      for (let i = 0; i < 40; i++) {
+        const mesh = new THREE.Mesh(petalGeo, petalMat.clone());
+        mesh.position.set(
+          (Math.random() - 0.5) * 30,
+          Math.random() * 20 - 5,
+          (Math.random() - 0.5) * 20
+        );
+        mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+        mesh.scale.setScalar(Math.random() * 0.8 + 0.6);
+        
+        scene.add(mesh);
+        fallingPetals.push({
+          mesh: mesh,
+          speedY: Math.random() * 0.03 + 0.015,
+          rotSpeedX: (Math.random() - 0.5) * 0.03,
+          rotSpeedY: (Math.random() - 0.5) * 0.03,
+          wobbleSpeed: Math.random() * 2 + 1,
+          wobbleOffset: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    // 3. Act 1: The Luminous 3D Single Hero Rose
+    function build3DHeroRose() {
+      heroFlowerGroup = new THREE.Group();
+      heroFlowerGroup.position.set(0, 0, 0);
+
+      const tex = createFeatheredTexture('images/rose.jpg');
+      const headGeo = new THREE.PlaneGeometry(3.6, 3.6);
+      const headMat = new THREE.MeshStandardMaterial({
+        map: tex,
+        transparent: true,
+        roughness: 0.35,
+        metalness: 0.05,
+        side: THREE.DoubleSide
+      });
+
+      // Layered depth petals
+      const petalBack = new THREE.Mesh(headGeo, headMat);
+      petalBack.position.z = -0.15;
+      petalBack.scale.set(1.08, 1.08, 1);
+      heroFlowerGroup.add(petalBack);
+
+      const petalFront = new THREE.Mesh(headGeo, headMat);
+      petalFront.position.z = 0.15;
+      petalFront.rotation.z = 0.2;
+      heroFlowerGroup.add(petalFront);
+
+      // Orbiting Golden Halo Ring
+      const ringGeo = new THREE.TorusGeometry(2.3, 0.02, 16, 100);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0xffd700,
+        transparent: true,
+        opacity: 0.65
+      });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.rotation.x = Math.PI / 2.3;
+      heroFlowerGroup.add(ring);
+
+      heroFlowerGroup.visible = false;
+      scene.add(heroFlowerGroup);
+    }
+
+    // 4. Act 2: The Real 3D Enchanted Botanical Meadow
+    function build3DEnchantedMeadow() {
+      gardenMeadowGroup = new THREE.Group();
+      gardenMeadowGroup.position.set(0, 0, 0);
+
+      // Glowing curved 3D ground bed
+      const groundGeo = new THREE.PlaneGeometry(36, 18, 32, 16);
+      const groundMat = new THREE.MeshStandardMaterial({
+        color: 0x07220e,
+        roughness: 0.8,
+        metalness: 0.1
+      });
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.position.set(0, -3.9, -2);
+      ground.rotation.x = -Math.PI / 2.3;
+      gardenMeadowGroup.add(ground);
+
+      // Construct each of the 7 living 3D flowers
+      flowerDefs.forEach((def, idx) => {
+        const flowerGroup = new THREE.Group();
+        flowerGroup.position.set(def.x, def.y, def.z);
+
+        // Curved 3D Stem (TubeGeometry)
+        const curveOffsetX = (idx % 2 === 0 ? 0.35 : -0.35);
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(curveOffsetX * 0.4, def.stemH * 0.35, 0.1),
+          new THREE.Vector3(curveOffsetX * 0.8, def.stemH * 0.7, -0.1),
+          new THREE.Vector3(curveOffsetX, def.stemH, 0)
+        ]);
+        const stemGeo = new THREE.TubeGeometry(curve, 20, 0.08, 8, false);
+        const stemMat = new THREE.MeshStandardMaterial({
+          color: 0x1e7e34,
+          roughness: 0.45,
+          metalness: 0.08
+        });
+        const stemMesh = new THREE.Mesh(stemGeo, stemMat);
+        flowerGroup.add(stemMesh);
+
+        // Leaves attached to stem
+        const leafGeo = new THREE.ConeGeometry(0.32, 1.1, 4);
+        leafGeo.scale(1, 0.25, 0.5);
+        const leafMat = new THREE.MeshStandardMaterial({
+          color: 0x15803d,
+          roughness: 0.4,
+          side: THREE.DoubleSide
+        });
+        const leaf1 = new THREE.Mesh(leafGeo, leafMat);
+        leaf1.position.set(curveOffsetX * 0.4, def.stemH * 0.35, 0.1);
+        leaf1.rotation.set(0.3, 0.3, -0.9);
+        flowerGroup.add(leaf1);
+
+        const leaf2 = new THREE.Mesh(leafGeo, leafMat);
+        leaf2.position.set(curveOffsetX * 0.7, def.stemH * 0.65, -0.1);
+        leaf2.rotation.set(-0.2, -0.4, 0.85);
+        flowerGroup.add(leaf2);
+
+        // Blossom Head at top
+        const blossomGroup = new THREE.Group();
+        blossomGroup.position.set(curveOffsetX, def.stemH, 0);
+
+        const tex = createFeatheredTexture(def.img);
+        const planeGeo = new THREE.PlaneGeometry(def.headSize, def.headSize);
+        const petalMat = new THREE.MeshStandardMaterial({
+          map: tex,
+          transparent: true,
+          alphaTest: 0.02,
+          roughness: 0.35,
+          metalness: 0.05,
+          side: THREE.DoubleSide
+        });
+
+        // Layer A: Background petals (offset in Z space for true 3D depth)
+        const petalA = new THREE.Mesh(planeGeo, petalMat);
+        petalA.position.z = -0.12;
+        petalA.rotation.z = 0.2;
+        petalA.scale.set(1.06, 1.06, 1);
+        blossomGroup.add(petalA);
+
+        // Layer B: Foreground petals
+        const petalB = new THREE.Mesh(planeGeo, petalMat);
+        petalB.position.z = 0.12;
+        petalB.rotation.z = -0.12;
+        blossomGroup.add(petalB);
+
+        // Interactive bounding sphere for raycasting
+        const hitSphere = new THREE.Mesh(
+          new THREE.SphereGeometry(def.headSize * 0.55, 8, 8),
+          new THREE.MeshBasicMaterial({ visible: false })
+        );
+        hitSphere.userData = { flowerIndex: idx, name: def.id };
+        blossomGroup.add(hitSphere);
+
+        // Dewdrop sparkle (glass sphere)
+        const dewGeo = new THREE.SphereGeometry(0.07, 10, 10);
+        const dewMat = new THREE.MeshPhysicalMaterial({
+          color: 0xffffff,
+          roughness: 0.1,
+          transmission: 0.9,
+          ior: 1.5
+        });
+        const dew = new THREE.Mesh(dewGeo, dewMat);
+        dew.position.set(def.headSize * 0.22, def.headSize * 0.22, 0.22);
+        blossomGroup.add(dew);
+
+        // Soft colored core light
+        const coreLight = new THREE.PointLight(def.glow, 0.75, 4.5);
+        coreLight.position.set(0, 0, 0.2);
+        blossomGroup.add(coreLight);
+
+        flowerGroup.add(blossomGroup);
+
+        flowerGroup.scale.set(0, 0, 0);
+        gardenMeadowGroup.add(flowerGroup);
+
+        created3DFlowers.push({
+          group: flowerGroup,
+          blossomGroup: blossomGroup,
+          def: def,
+          stemMesh: stemMesh,
+          hitSphere: hitSphere,
+          baseY: def.y,
+          swayPhase: idx * 0.85
+        });
+      });
+
+      gardenMeadowGroup.visible = false;
+      scene.add(gardenMeadowGroup);
+    }
+
+    // 5. 3D Dancing Fireflies
+    function build3DFireflies() {
+      const ffCanvas = document.createElement('canvas');
+      ffCanvas.width = 32;
+      ffCanvas.height = 32;
+      const ffCtx = ffCanvas.getContext('2d');
+      const grad = ffCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, 'rgba(255, 255, 220, 1)');
+      grad.addColorStop(0.3, 'rgba(255, 215, 0, 0.8)');
+      grad.addColorStop(1, 'rgba(255, 215, 0, 0)');
+      ffCtx.fillStyle = grad;
+      ffCtx.fillRect(0, 0, 32, 32);
+      const ffTex = new THREE.CanvasTexture(ffCanvas);
+
+      for (let i = 0; i < 8; i++) {
+        const spriteMat = new THREE.SpriteMaterial({
+          map: ffTex,
+          color: 0xffe680,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+        const sprite = new THREE.Sprite(spriteMat);
+        sprite.scale.set(0.6, 0.6, 1);
+        scene.add(sprite);
+
+        fireflies.push({
+          sprite: sprite,
+          speedX: 0.6 + i * 0.15,
+          speedY: 0.8 + i * 0.12,
+          speedZ: 0.5 + i * 0.18,
+          radiusX: 5.5 + (i % 3) * 1.5,
+          radiusY: 2.2 + (i % 2),
+          radiusZ: 4.5 + (i % 4),
+          phase: i * 1.2
+        });
+      }
+    }
+
+    // Main 3D Render Loop
+    let clock = new THREE.Clock();
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      const delta = clock.getDelta();
+      const time = clock.getElapsedTime();
+
+      // Camera Parallax Lerp
+      currentCameraX += (targetCameraX - currentCameraX) * 0.05;
+      currentCameraY += (targetCameraY - currentCameraY) * 0.05;
+      camera.position.x = currentCameraX;
+      camera.position.y = currentCameraY;
+      camera.lookAt(0, 0, 0);
+
+      // Interactive Light Tracking
+      if (interactivePointLight) {
+        interactivePointLight.position.x = currentCameraX * 1.5;
+        interactivePointLight.position.y = currentCameraY * 1.5 + 1;
+      }
+
+      // Rotate Stardust Galaxy
+      if (stardustParticles) {
+        stardustParticles.rotation.y = time * 0.02;
+        stardustParticles.rotation.x = Math.sin(time * 0.015) * 0.05;
+      }
+
+      // Animate Falling Petals
+      fallingPetals.forEach(p => {
+        p.mesh.position.y -= p.speedY;
+        p.mesh.position.x += Math.sin(time * p.wobbleSpeed + p.wobbleOffset) * 0.012;
+        p.mesh.rotation.x += p.rotSpeedX;
+        p.mesh.rotation.y += p.rotSpeedY;
+        if (p.mesh.position.y < -12) {
+          p.mesh.position.y = 12;
+          p.mesh.position.x = (Math.random() - 0.5) * 30;
+        }
+      });
+
+      // Animate Fireflies Lissajous curves
+      fireflies.forEach(ff => {
+        ff.sprite.position.x = Math.sin(time * ff.speedX + ff.phase) * ff.radiusX;
+        ff.sprite.position.y = Math.cos(time * ff.speedY + ff.phase) * ff.radiusY;
+        ff.sprite.position.z = Math.sin(time * ff.speedZ + ff.phase) * ff.radiusZ;
+        const pulse = 0.5 + 0.3 * Math.sin(time * 4 + ff.phase);
+        ff.sprite.scale.set(pulse, pulse, 1);
+      });
+
+      // Animate Hero Rose
+      if (heroFlowerGroup && heroFlowerGroup.visible) {
+        heroFlowerGroup.rotation.y = Math.sin(time * 0.8) * 0.15;
+        heroFlowerGroup.rotation.x = Math.cos(time * 0.6) * 0.08;
+      }
+
+      // Animate 3D Meadow Flower Stalks (Individual wind sway)
+      if (gardenMeadowGroup && gardenMeadowGroup.visible) {
+        created3DFlowers.forEach(f => {
+          if (f.isGathering) return;
+          const swayZ = Math.sin(time * f.def.swaySpeed + f.swayPhase) * f.def.swayAngle;
+          const swayX = Math.cos(time * f.def.swaySpeed * 0.8 + f.swayPhase) * (f.def.swayAngle * 0.6);
+          f.group.rotation.z = swayZ;
+          f.group.rotation.x = swayX;
+        });
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.position.z = window.innerWidth < 600 ? 19 : 15;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function onPointerMove(e) {
+      targetCameraX = ((e.clientX / window.innerWidth) - 0.5) * 3.5;
+      targetCameraY = -((e.clientY / window.innerHeight) - 0.5) * 2.5;
+    }
+
+    function onDeviceOrientation(e) {
+      if (e.gamma !== null && e.beta !== null) {
+        targetCameraX = (e.gamma / 45) * 2.8;
+        targetCameraY = ((e.beta - 45) / 45) * 2.0;
+      }
+    }
+
+    // Raycasting click to touch flowers in 3D
+    function onCanvasClick(e) {
+      if (!gardenMeadowGroup || !gardenMeadowGroup.visible) return;
+      mouseVector.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseVector.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouseVector, camera);
+
+      const hitSpheres = created3DFlowers.map(f => f.hitSphere);
+      const intersects = raycaster.intersectObjects(hitSpheres);
+
+      if (intersects.length > 0) {
+        const hitIdx = intersects[0].object.userData.flowerIndex;
+        triggerFlower3DBounce(hitIdx);
+      }
+    }
+
+    function triggerFlower3DBounce(idx) {
+      const flower = created3DFlowers[idx];
+      if (!flower || flower.isGathering) return;
+      try { sound.playFlowerPluck(idx); } catch (err) {}
+
+      // 3D bounce animation
+      const startScale = flower.group.scale.x;
+      let startTime = performance.now();
+      function bounceLoop(now) {
+        const elapsed = (now - startTime) / 1000;
+        if (elapsed < 0.45) {
+          const factor = Math.sin(elapsed * Math.PI / 0.45);
+          flower.group.scale.setScalar(startScale + factor * 0.28);
+          requestAnimationFrame(bounceLoop);
+        } else {
+          flower.group.scale.setScalar(startScale);
+        }
+      }
+      requestAnimationFrame(bounceLoop);
+
+      // Trigger 2D petal burst overlay
+      triggerConfettiBurst(25);
+    }
+
+    /* =========================================================
+       3. 2D OVERLAY CONFETTI ENGINE
+       ========================================================= */
     const confettiCanvas = document.getElementById('confettiCanvas');
     const confettiCtx = confettiCanvas.getContext('2d');
+    let confettiParticles = [];
 
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-
-    function resizeCanvases() {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      bgCanvas.width = width;
-      bgCanvas.height = height;
-      confettiCanvas.width = width;
-      confettiCanvas.height = height;
+    function resizeConfetti() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
     }
-    window.addEventListener('resize', resizeCanvases);
-    resizeCanvases();
-
-    const stars = [];
-    const petals = [];
-    const fireworks = [];
-
-    for (let i = 0; i < 70; i++) {
-      stars.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        r: Math.random() * 2 + 0.5,
-        alpha: Math.random(),
-        speed: Math.random() * 0.02 + 0.008,
-        drift: (Math.random() - 0.5) * 0.3
-      });
-    }
-
-    function createPetal(burst = false, customX, customY) {
-      return {
-        x: customX !== undefined ? customX : Math.random() * width,
-        y: customY !== undefined ? customY : (burst ? height * 0.45 : -20),
-        size: Math.random() * 14 + 10,
-        vx: burst ? (Math.random() - 0.5) * 8 : (Math.random() - 0.5) * 1.5 + 0.5,
-        vy: burst ? (Math.random() - 0.5) * 8 - 3 : Math.random() * 1.2 + 0.8,
-        angle: Math.random() * Math.PI * 2,
-        vAngle: (Math.random() - 0.5) * 0.04,
-        color: ['#ff85a2', '#ff5c8a', '#ff99c8', '#fec5bb', '#ff477e', '#ffd1dc'][Math.floor(Math.random() * 6)],
-        opacity: Math.random() * 0.4 + 0.5,
-        flapSpeed: Math.random() * 0.08 + 0.03,
-        flapAngle: 0
-      };
-    }
-
-    for (let i = 0; i < 28; i++) {
-      const p = createPetal();
-      p.y = Math.random() * height;
-      petals.push(p);
-    }
+    window.addEventListener('resize', resizeConfetti);
+    resizeConfetti();
 
     function triggerConfettiBurst(count = 90) {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
       for (let i = 0; i < count; i++) {
-        fireworks.push({
-          x: width * 0.5 + (Math.random() - 0.5) * 200,
-          y: height * 0.45 + (Math.random() - 0.5) * 150,
+        confettiParticles.push({
+          x: w * 0.5 + (Math.random() - 0.5) * 200,
+          y: h * 0.45 + (Math.random() - 0.5) * 150,
           vx: (Math.random() - 0.5) * 16,
           vy: (Math.random() - 0.5) * 16 - 4,
-          gravity: 0.22,
+          gravity: 0.24,
           size: Math.random() * 8 + 4,
           rotation: Math.random() * 360,
-          vRot: (Math.random() - 0.5) * 15,
+          vRot: (Math.random() - 0.5) * 16,
           color: ['#ffd700', '#ff007f', '#00f0ff', '#ff6b9d', '#ffffff', '#7000ff'][Math.floor(Math.random() * 6)],
           alpha: 1.0,
           decay: Math.random() * 0.012 + 0.008
@@ -1541,152 +1738,60 @@
       }
     }
 
-    function renderLoop() {
-      bgCtx.clearRect(0, 0, width, height);
-      for (const s of stars) {
-        s.alpha += s.speed;
-        s.x += s.drift;
-        if (s.x < 0) s.x = width;
-        if (s.x > width) s.x = 0;
-        const currentAlpha = 0.3 + 0.5 * Math.sin(s.alpha);
-        bgCtx.fillStyle = `rgba(255, 230, 245, ${Math.max(0, currentAlpha)})`;
-        bgCtx.beginPath();
-        bgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        bgCtx.fill();
-      }
-
-      for (let i = 0; i < petals.length; i++) {
-        const p = petals[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.angle += p.vAngle;
-        p.flapAngle += p.flapSpeed;
-        if (p.y > height + 20 || p.x < -40 || p.x > width + 40) {
-          petals[i] = createPetal();
-        }
-        bgCtx.save();
-        bgCtx.translate(p.x, p.y);
-        bgCtx.rotate(p.angle);
-        const scaleX = Math.cos(p.flapAngle);
-        bgCtx.scale(scaleX, 1);
-        bgCtx.fillStyle = p.color;
-        bgCtx.globalAlpha = p.opacity;
-        bgCtx.beginPath();
-        bgCtx.moveTo(0, 0);
-        bgCtx.bezierCurveTo(p.size * 0.6, -p.size * 0.4, p.size * 0.8, p.size * 0.7, 0, p.size);
-        bgCtx.bezierCurveTo(-p.size * 0.8, p.size * 0.7, -p.size * 0.6, -p.size * 0.4, 0, 0);
-        bgCtx.fill();
-        bgCtx.restore();
-      }
-
-      confettiCtx.clearRect(0, 0, width, height);
-      for (let i = fireworks.length - 1; i >= 0; i--) {
-        const f = fireworks[i];
+    function renderConfettiLoop() {
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      for (let i = confettiParticles.length - 1; i >= 0; i--) {
+        const f = confettiParticles[i];
         f.x += f.vx;
         f.y += f.vy;
         f.vy += f.gravity;
         f.rotation += f.vRot;
         f.alpha -= f.decay;
         if (f.alpha <= 0) {
-          fireworks.splice(i, 1);
+          confettiParticles.splice(i, 1);
           continue;
         }
         confettiCtx.save();
         confettiCtx.translate(f.x, f.y);
-        confettiCtx.rotate(f.rotation * Math.PI / 180);
+        confettiCtx.rotate((f.rotation * Math.PI) / 180);
         confettiCtx.fillStyle = f.color;
-        confettiCtx.globalAlpha = f.alpha;
-        confettiCtx.fillRect(-f.size / 2, -f.size / 2, f.size, f.size * 1.4);
+        confettiCtx.globalAlpha = Math.max(0, f.alpha);
+        confettiCtx.fillRect(-f.size * 0.5, -f.size * 0.5, f.size, f.size * 0.6);
         confettiCtx.restore();
       }
-
-      requestAnimationFrame(renderLoop);
+      requestAnimationFrame(renderConfettiLoop);
     }
-    requestAnimationFrame(renderLoop);
+    renderConfettiLoop();
 
     /* =========================================================
-       3. URL CUSTOMIZATION (TO=NAME)
-       ========================================================= */
-    const urlParams = new URLSearchParams(window.location.search);
-    const targetRecipient = urlParams.get('to') || urlParams.get('name');
-    if (targetRecipient) {
-      document.getElementById('letterRecipientHeader').textContent = `Gửi ${targetRecipient}! 🌸`;
-    }
-
-        /* =========================================================
-       4. CINEMATIC FLOW CONTROLLER (IOS SAFARI OPTIMIZED)
+       4. STORYLINE & CINEMATIC ORCHESTRATION
        ========================================================= */
     const stageIntro = document.getElementById('stageIntro');
-    const stageGardenCinematic = document.getElementById('stageGardenCinematic');
-    const singleHeroFlower = document.getElementById('singleHeroFlower');
-    const enchantedGardenMeadow = document.getElementById('enchantedGardenMeadow');
+    const storyCaptionBox = document.getElementById('storyCaptionBox');
     const storyTitle = document.getElementById('storyTitle');
     const storyDesc = document.getElementById('storyDesc');
-
+    const gardenHint = document.getElementById('gardenHint');
     const stageBouquetReveal = document.getElementById('stageBouquetReveal');
     const stageLetterView = document.getElementById('stageLetterView');
     const stageFinale = document.getElementById('stageFinale');
-
-    const ambientBg = document.getElementById('ambientBg');
     const bnhVideo = document.getElementById('bnhVideo');
     const videoPlayHint = document.getElementById('videoPlayHint');
+    const ambientLight = document.getElementById('ambientLight');
+    const letterTextBody = document.getElementById('letterTextBody');
 
-    const musicIconOn = document.getElementById('musicIconOn');
-    const musicIconOff = document.getElementById('musicIconOff');
+    const fullLetterMessage = `Nhân ngày 20/10, xin gửi tới các chị em đồng nghiệp những lời chúc tốt đẹp và rạng rỡ nhất!\n\nChúc các chị em luôn xinh đẹp, duyên dáng, tràn đầy năng lượng tích cực và luôn tỏa sáng rực rỡ trong cả công việc lẫn cuộc sống.\n\nCảm ơn sự đóng góp, nụ cười và tinh thần làm việc tuyệt vời của mọi người đã luôn làm cho team chúng ta ngập tràn sắc màu và niềm vui mỗi ngày! 🌸`;
 
-    // Typewriter variables
-    const letterTextEl = document.getElementById('letterTextBody');
-    const initialLetterMessage = letterTextEl ? letterTextEl.textContent.trim() : '';
-    let typewriterTimer = null;
-    let isTyping = false;
-
-    function startTypewriterLetter() {
-      if (!letterTextEl || !initialLetterMessage) return;
-      if (typewriterTimer) clearInterval(typewriterTimer);
-      letterTextEl.textContent = '';
-      isTyping = true;
-      let charIdx = 0;
-      const speed = 20;
-
-      typewriterTimer = setInterval(() => {
-        if (charIdx < initialLetterMessage.length) {
-          const ch = initialLetterMessage.charAt(charIdx);
-          letterTextEl.textContent += ch;
-          if (charIdx % 2 === 0 || ch === ' ' || ch === '\n') {
-            try { sound.playTypewriterClick(ch === ' ' || ch === '\n'); } catch (e) {}
-          }
-          charIdx++;
-        } else {
-          clearInterval(typewriterTimer);
-          typewriterTimer = null;
-          isTyping = false;
-        }
-      }, speed);
-    }
-
-    // Skip typewriter when tapping letter
-    if (stageLetterView) {
-      stageLetterView.addEventListener('click', (e) => {
-        if (e.target.closest('#btnMysteryGift')) return;
-        if (isTyping && typewriterTimer) {
-          clearInterval(typewriterTimer);
-          typewriterTimer = null;
-          isTyping = false;
-          if (letterTextEl) letterTextEl.textContent = initialLetterMessage;
-        }
-      });
-    }
-
-    // 1. START EXPERIENCE (Ultra-resilient iOS Safari & Mobile touch handling)
     let hasStarted = false;
     let userManuallyPaused = false;
+    let typewriterTimer = null;
 
+    // START EXPERIENCE (Touch & Click support for iOS Safari)
     window.handleStart = function(e) {
       if (e && e.stopPropagation) e.stopPropagation();
       if (hasStarted) return;
       hasStarted = true;
 
-      // Unmute & play audio safely in user gesture
+      // Play audio safely
       try {
         const bgAudio = document.getElementById('bgAudio');
         if (bgAudio) {
@@ -1694,6 +1799,8 @@
           const p = bgAudio.play();
           if (p !== undefined) {
             p.then(() => {
+              const musicIconOn = document.getElementById('musicIconOn');
+              const musicIconOff = document.getElementById('musicIconOff');
               if (musicIconOn) musicIconOn.style.display = 'block';
               if (musicIconOff) musicIconOff.style.display = 'none';
             }).catch(() => {});
@@ -1711,7 +1818,7 @@
 
       setTimeout(() => {
         stageIntro.style.display = 'none';
-        runCinematicSequence();
+        runCinematic3DSequence();
       }, 550);
     };
 
@@ -1719,15 +1826,8 @@
       stageIntro.addEventListener('click', window.handleStart);
       stageIntro.addEventListener('touchend', window.handleStart);
     }
-    const tapStartBtn = document.getElementById('tapStartBtn');
-    if (tapStartBtn) {
-      tapStartBtn.addEventListener('click', window.handleStart);
-      tapStartBtn.addEventListener('touchend', window.handleStart);
-    }
     document.addEventListener('click', function(e) {
-      if (!hasStarted) {
-        window.handleStart(e);
-      }
+      if (!hasStarted) window.handleStart(e);
     });
     document.addEventListener('touchstart', function() {
       try { sound.init(); } catch (err) {}
@@ -1743,101 +1843,146 @@
       }
     }, { passive: true });
 
-    // Interactive bloom touch feedback
-    document.querySelectorAll('.garden-bloom').forEach((bloom, idx) => {
-      bloom.addEventListener('click', (e) => {
-        if (bloom.classList.contains('gathering')) return;
-        try { sound.playFlowerPluck(idx); } catch (err) {}
-        const rect = bloom.getBoundingClientRect();
-        for (let p = 0; p < 8; p++) {
-          petals.push(createPetal(true, rect.left + rect.width * 0.5, rect.top + 20));
-        }
-        bloom.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-        bloom.style.transform = 'scale(1.15) translateY(-8px)';
-        setTimeout(() => {
-          bloom.style.transform = '';
-          bloom.style.transition = '';
-        }, 300);
-      });
-    });
-
-    function runCinematicSequence() {
-      stageGardenCinematic.classList.add('active');
-      singleHeroFlower.style.display = 'block';
-      if (enchantedGardenMeadow) enchantedGardenMeadow.style.display = 'none';
+    // Main 3D Cinematic Storyline
+    function runCinematic3DSequence() {
+      storyCaptionBox.style.display = 'block';
       storyTitle.textContent = 'Đóa Hoa Đầu Tiên';
       storyDesc.textContent = '“Mỗi người phụ nữ là một đóa hoa độc bản, mang ánh sáng dịu dàng sưởi ấm thế gian...”';
 
-      // Act 2: Real Garden Expands & Blooms
+      // Act 1: Luminous 3D Hero Rose Unfurls
+      if (heroFlowerGroup) {
+        heroFlowerGroup.visible = true;
+        heroFlowerGroup.scale.set(0.1, 0.1, 0.1);
+        
+        let startBloom = performance.now();
+        function bloomHero(now) {
+          const elapsed = (now - startBloom) / 1000;
+          if (elapsed < 1.4) {
+            const progress = elapsed / 1.4;
+            const s = Math.sin(progress * Math.PI * 0.5) * 1.0;
+            heroFlowerGroup.scale.set(s, s, s);
+            requestAnimationFrame(bloomHero);
+          } else {
+            heroFlowerGroup.scale.set(1, 1, 1);
+          }
+        }
+        requestAnimationFrame(bloomHero);
+      }
+
+      // Act 2: Expand into 3D Enchanted Meadow
       setTimeout(() => {
         try { sound.playHarpGlissando(); } catch (e) {}
-        triggerConfettiBurst(35);
+        triggerConfettiBurst(40);
 
-        singleHeroFlower.style.opacity = '0';
-        singleHeroFlower.style.transform = 'scale(0.5)';
+        // Fade out hero rose
+        if (heroFlowerGroup) {
+          let startFade = performance.now();
+          function fadeHero(now) {
+            const elapsed = (now - startFade) / 1000;
+            if (elapsed < 0.8) {
+              const s = (1 - elapsed / 0.8);
+              heroFlowerGroup.scale.set(s, s, s);
+              requestAnimationFrame(fadeHero);
+            } else {
+              heroFlowerGroup.visible = false;
+            }
+          }
+          requestAnimationFrame(fadeHero);
+        }
 
         setTimeout(() => {
-          singleHeroFlower.style.display = 'none';
           storyTitle.textContent = 'Vườn Hoa Rực Rỡ';
           storyDesc.textContent = '“Cả một vườn hoa ngát hương cùng nhau khoe sắc đón chào ngày 20/10...”';
-          
-          if (enchantedGardenMeadow) {
-            enchantedGardenMeadow.style.display = 'block';
-            
-            // Bloom flowers sequentially across the meadow
-            const blooms = document.querySelectorAll('.garden-bloom');
-            blooms.forEach((b, idx) => {
-              b.classList.remove('gathering');
-              b.classList.remove('blooming');
+          if (gardenHint) gardenHint.style.display = 'block';
+
+          if (gardenMeadowGroup) {
+            gardenMeadowGroup.visible = true;
+
+            // Sequentially sprout 7 flowers in 3D
+            created3DFlowers.forEach((f, idx) => {
+              f.isGathering = false;
+              f.group.position.set(f.def.x, f.def.y, f.def.z);
+              f.group.scale.set(0, 0, 0);
+
               setTimeout(() => {
-                b.classList.add('blooming');
                 try { sound.playFlowerPluck(idx); } catch (err) {}
-                for (let p = 0; p < 8; p++) {
-                  petals.push(createPetal(true, width * (0.12 + idx * 0.12), height * 0.58));
+                let startT = performance.now();
+                function sproutFlower(now) {
+                  const elapsed = (now - startT) / 1000;
+                  if (elapsed < 0.75) {
+                    const progress = elapsed / 0.75;
+                    // Elastic overshoot
+                    const s = Math.sin(progress * Math.PI * 0.55) * 1.08;
+                    f.group.scale.set(s, s, s);
+                    requestAnimationFrame(sproutFlower);
+                  } else {
+                    f.group.scale.set(1, 1, 1);
+                  }
                 }
-              }, idx * 160);
+                requestAnimationFrame(sproutFlower);
+              }, idx * 170);
             });
           }
-        }, 500);
-      }, 3000);
+        }, 600);
 
-      // Act 3: Gathering into Bouquet
+      }, 3200);
+
+      // Act 3: Gathering into Luxury Bouquet
       setTimeout(() => {
+        if (gardenHint) gardenHint.style.display = 'none';
         storyTitle.textContent = 'Kết Tinh Bó Hoa Trao Nàng';
         storyDesc.textContent = '“Từng đóa hoa tươi thắm nhất tự động quy tụ, dệt nên một bó hoa tuyệt mỹ dành tặng bạn...”';
 
-        const blooms = document.querySelectorAll('.garden-bloom');
-        blooms.forEach((bloom, idx) => {
+        // 3D spiral gathering to center
+        created3DFlowers.forEach((f, idx) => {
+          f.isGathering = true;
           setTimeout(() => {
             try { sound.playFlowerPluck(idx); } catch (e) {}
-            bloom.classList.add('gathering');
-            for (let p = 0; p < 10; p++) {
-              petals.push(createPetal(true, width * 0.5 + (Math.random() - 0.5) * 80, height * 0.45));
+            let startFly = performance.now();
+            const startX = f.group.position.x;
+            const startY = f.group.position.y;
+            const startZ = f.group.position.z;
+
+            function flyToCenter(now) {
+              const elapsed = (now - startFly) / 1000;
+              if (elapsed < 1.1) {
+                const p = elapsed / 1.1;
+                // Spiral path toward center (0, 0, 0)
+                const angle = p * Math.PI * 2;
+                f.group.position.x = (1 - p) * startX + Math.sin(angle) * (1 - p) * 1.5;
+                f.group.position.y = (1 - p) * startY + p * 1.0;
+                f.group.position.z = (1 - p) * startZ;
+                f.group.scale.setScalar((1 - p) * 0.9 + 0.1);
+                requestAnimationFrame(flyToCenter);
+              } else {
+                f.group.scale.set(0, 0, 0);
+              }
             }
-          }, idx * 220);
+            requestAnimationFrame(flyToCenter);
+          }, idx * 200);
         });
 
-        // Paper Swoosh sound
+        // Silk wrap rustle
         setTimeout(() => {
           try { sound.playWrapSwoosh(); } catch (e) {}
-        }, 1600);
+        }, 1400);
 
-        // Act 4: Reveal Bouquet
+        // Reveal Bouquet Showcase
         setTimeout(() => {
           try { sound.playBouquetReveal(); } catch (e) {}
-          triggerConfettiBurst(80);
+          triggerConfettiBurst(85);
 
-          stageGardenCinematic.classList.remove('active');
-          setTimeout(() => {
-            stageGardenCinematic.style.display = 'none';
-            stageBouquetReveal.classList.add('active');
-          }, 600);
+          if (gardenMeadowGroup) gardenMeadowGroup.visible = false;
+          storyCaptionBox.style.display = 'none';
+
+          stageBouquetReveal.style.display = 'flex';
+          setTimeout(() => stageBouquetReveal.classList.add('active'), 30);
         }, 2200);
 
-      }, 6400);
+      }, 6800);
     }
 
-    // 2. OPEN LETTER
+    // OPEN LETTER
     window.openLetterCard = function(e) {
       if (e && e.stopPropagation) e.stopPropagation();
       try { sound.playEnvelopeOpen(); } catch (err) {}
@@ -1850,11 +1995,57 @@
         setTimeout(() => {
           stageLetterView.classList.add('active');
           startTypewriterLetter();
-        }, 20);
+        }, 30);
       }, 500);
     };
 
-    // 3. TRIGGER MYSTERY GIFT -> KHÁ BẢNH
+    // Typewriter Effect
+    function startTypewriterLetter() {
+      if (!letterTextBody || !fullLetterMessage) return;
+      if (typewriterTimer) clearInterval(typewriterTimer);
+      letterTextBody.textContent = '';
+      let charIdx = 0;
+      const speed = 22;
+
+      typewriterTimer = setInterval(() => {
+        if (charIdx < fullLetterMessage.length) {
+          const ch = fullLetterMessage.charAt(charIdx);
+          letterTextBody.textContent += ch;
+          if (charIdx % 2 === 0 || ch === ' ' || ch === '\n') {
+            try { sound.playTypewriterClick(ch === ' ' || ch === '\n'); } catch (e) {}
+          }
+          charIdx++;
+        } else {
+          clearInterval(typewriterTimer);
+          typewriterTimer = null;
+        }
+      }, speed);
+    }
+
+    // Skip typewriter when tapping letter card
+    if (stageLetterView) {
+      stageLetterView.addEventListener('click', (e) => {
+        if (e.target.closest('#btnMysteryGift')) return;
+        if (typewriterTimer) {
+          clearInterval(typewriterTimer);
+          typewriterTimer = null;
+          letterTextBody.textContent = fullLetterMessage;
+        }
+      });
+    }
+
+    // 3D Card Interactive Tilt
+    const letterCard = document.getElementById('letterCard');
+    if (letterCard) {
+      window.addEventListener('pointermove', (e) => {
+        if (!stageLetterView.classList.contains('active')) return;
+        const xPercent = (e.clientX / window.innerWidth - 0.5) * 16;
+        const yPercent = (e.clientY / window.innerHeight - 0.5) * -16;
+        letterCard.style.transform = `perspective(1000px) rotateX(${yPercent}deg) rotateY(${xPercent}deg)`;
+      });
+    }
+
+    // TRIGGER MYSTERY GIFT -> KHÁ BẢNH
     window.triggerMysteryGift = function(e) {
       if (e && e.stopPropagation) e.stopPropagation();
       try {
@@ -1864,23 +2055,23 @@
       try { sound.playConfettiBurst(); } catch (err) {}
       triggerConfettiBurst(120);
 
-      ambientBg.classList.add('party-mode');
+      ambientLight.classList.add('party-mode');
       stageLetterView.classList.remove('active');
 
       setTimeout(() => {
         stageLetterView.style.display = 'none';
         stageFinale.style.display = 'flex';
-        setTimeout(() => stageFinale.classList.add('active'), 20);
+        setTimeout(() => stageFinale.classList.add('active'), 30);
 
         bnhVideo.currentTime = 0;
-        const playPromise = bnhVideo.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => videoPlayHint.classList.add('visible'));
+        const p = bnhVideo.play();
+        if (p !== undefined) {
+          p.catch(() => videoPlayHint.classList.add('visible'));
         }
-      }, 600);
+      }, 550);
     };
 
-    // 4. VIDEO PLAY / PAUSE
+    // VIDEO PLAY / PAUSE
     window.toggleVideoPlay = function(e) {
       if (e && e.stopPropagation) e.stopPropagation();
       if (bnhVideo.paused) {
@@ -1891,14 +2082,11 @@
       }
     };
 
-    // 5. FINALE ACTIONS
+    // FINALE ACTIONS
     window.triggerFlowerRain = function(e) {
       if (e && e.stopPropagation) e.stopPropagation();
-      for (let i = 0; i < 60; i++) {
-        petals.push(createPetal(true, Math.random() * width, -10));
-      }
-      triggerConfettiBurst(80);
-      try { sound.playTone(1046.50, 'sine', 1.0, 0.2); } catch (err) {}
+      triggerConfettiBurst(100);
+      try { sound.playFlowerPluck(4); } catch (err) {}
     };
 
     window.replayVideo = function(e) {
@@ -1911,13 +2099,13 @@
       if (e && e.stopPropagation) e.stopPropagation();
       bnhVideo.pause();
       bnhVideo.currentTime = 0;
-      ambientBg.classList.remove('party-mode');
+      ambientLight.classList.remove('party-mode');
       stageFinale.classList.remove('active');
 
       setTimeout(() => {
         stageFinale.style.display = 'none';
         stageLetterView.style.display = 'flex';
-        setTimeout(() => stageLetterView.classList.add('active'), 20);
+        setTimeout(() => stageLetterView.classList.add('active'), 30);
         try {
           const bgAudio = document.getElementById('bgAudio');
           if (bgAudio) bgAudio.play().catch(() => {});
@@ -1929,7 +2117,7 @@
       if (e && e.stopPropagation) e.stopPropagation();
       bnhVideo.pause();
       bnhVideo.currentTime = 0;
-      ambientBg.classList.remove('party-mode');
+      ambientLight.classList.remove('party-mode');
 
       stageFinale.classList.remove('active');
       stageFinale.style.display = 'none';
@@ -1937,17 +2125,18 @@
       stageLetterView.style.display = 'none';
       stageBouquetReveal.classList.remove('active');
       stageBouquetReveal.style.display = 'none';
-      stageGardenCinematic.classList.remove('active');
-      stageGardenCinematic.style.display = 'none';
+      storyCaptionBox.style.display = 'none';
+      if (gardenHint) gardenHint.style.display = 'none';
 
-      document.querySelectorAll('.garden-bloom').forEach(b => {
-        b.classList.remove('gathering');
-        b.classList.remove('blooming');
-      });
-      singleHeroFlower.style.display = 'block';
-      singleHeroFlower.style.opacity = '1';
-      singleHeroFlower.style.transform = 'scale(1)';
-      if (enchantedGardenMeadow) enchantedGardenMeadow.style.display = 'none';
+      if (heroFlowerGroup) heroFlowerGroup.visible = false;
+      if (gardenMeadowGroup) {
+        gardenMeadowGroup.visible = false;
+        created3DFlowers.forEach(f => {
+          f.isGathering = false;
+          f.group.scale.set(0, 0, 0);
+          f.group.position.set(f.def.x, f.def.y, f.def.z);
+        });
+      }
 
       hasStarted = false;
       stageIntro.style.display = 'flex';
@@ -1957,10 +2146,13 @@
       }, 50);
     };
 
+    // SOUND TOGGLE
     window.toggleSound = function(e) {
       if (e && e.stopPropagation) e.stopPropagation();
       try { sound.init(); } catch (err) {}
       const bgAudio = document.getElementById('bgAudio');
+      const musicIconOn = document.getElementById('musicIconOn');
+      const musicIconOff = document.getElementById('musicIconOff');
       if (bgAudio) {
         if (bgAudio.paused) {
           userManuallyPaused = false;
@@ -1980,6 +2172,12 @@
 
     bnhVideo.addEventListener('ended', () => {
       triggerConfettiBurst(90);
+    });
+
+    // Initialize 3D Engine on load
+    window.addEventListener('DOMContentLoaded', () => {
+      init3DWorld();
+      
     });
   </script>
 </body>
