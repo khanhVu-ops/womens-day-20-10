@@ -28,6 +28,7 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     body, html {
@@ -822,7 +823,7 @@
   <audio id="bgAudio" src="bg_music.mp3" loop preload="auto"></audio>
 
   <div class="sound-btn-box">
-    <button class="glass-btn-icon" id="soundToggleBtn" title="Bật/Tắt Nhạc Nền">
+    <button class="glass-btn-icon" id="soundToggleBtn" onclick="toggleSound(event)" title="Bật/Tắt Nhạc Nền">
       <svg id="musicIconOn" viewBox="0 0 24 24">
         <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
       </svg>
@@ -837,13 +838,13 @@
     <!-- ========================================================
          STAGE 0: GENTLE TOUCH TO BEGIN
          ======================================================== -->
-    <div id="stageIntro">
+    <div id="stageIntro" onclick="handleStart(event)">
       <div class="intro-flower-icon">
         <img src="images/rose.jpg" alt="Hoa Hồng Tuyệt Mỹ">
       </div>
       <h1 class="intro-title">Chào Ngày Phụ Nữ Việt Nam</h1>
       <p class="intro-sub">Chạm nhẹ để bắt đầu hành trình kỳ diệu dệt nên bó hoa dành tặng bạn ✨</p>
-      <button class="tap-start-btn">
+      <button class="tap-start-btn" id="tapStartBtn" onclick="handleStart(event)">
         <span>Bắt Đầu Hành Trình 🌸</span>
       </button>
     </div>
@@ -912,13 +913,13 @@
         <img class="bouquet-photo-img" src="images/bouquet.jpg" alt="Bó Hoa Tuyệt Mỹ 20/10">
         
         <!-- Tucked letter in bouquet -->
-        <div class="tucked-bouquet-letter" id="tuckedLetter">
+        <div class="tucked-bouquet-letter" id="tuckedLetter" onclick="openLetterCard(event)">
           <div class="wax-seal-badge">★</div>
           <span class="tucked-tag-label">Mở Bức Thư 💌</span>
         </div>
       </div>
 
-      <button class="open-letter-action-btn" id="btnOpenLetter">
+      <button class="open-letter-action-btn" id="btnOpenLetter" onclick="openLetterCard(event)">
         <span>Mở Bức Thư Chúc Mừng 20/10 💌</span>
       </button>
 
@@ -954,7 +955,7 @@
         </div>
 
         <!-- The Mystery Gift Trigger (Khá Bảnh Climax) -->
-        <div class="mystery-box-section" id="btnMysteryGift">
+        <div class="mystery-box-section" id="btnMysteryGift" onclick="triggerMysteryGift(event)">
           <div class="mystery-info">
             <span class="mystery-tag">
               <span>🎁</span> MÓN QUÀ BẤT NGỜ TỪ ĐẠI SỨ ĐẶC BIỆT
@@ -981,8 +982,8 @@
           </div>
         </div>
 
-        <div class="video-viewport" id="videoContainer">
-          <video id="bnhVideo" playsinline preload="auto">
+        <div class="video-viewport" id="videoContainer" onclick="toggleVideoPlay(event)">
+          <video id="bnhVideo" playsinline webkit-playsinline x5-playsinline preload="auto">
             <source src="video.mp4" type="video/mp4">
             Trình duyệt không hỗ trợ thẻ video.
           </video>
@@ -1000,16 +1001,16 @@
         </div>
 
         <div class="finale-actions">
-          <button class="action-pill-btn primary" id="btnFlowerRain">
+          <button class="action-pill-btn primary" id="btnFlowerRain" onclick="triggerFlowerRain(event)">
             <span>🌸</span> Rắc Mưa Hoa
           </button>
-          <button class="action-pill-btn" id="btnReplayVideo">
+          <button class="action-pill-btn" id="btnReplayVideo" onclick="replayVideo(event)">
             <span>▶️</span> Phát Lại Video
           </button>
-          <button class="action-pill-btn" id="btnBackToLetter">
+          <button class="action-pill-btn" id="btnBackToLetter" onclick="backToLetter(event)">
             <span>💌</span> Xem Lại Thư
           </button>
-          <button class="action-pill-btn" id="btnReplayAll">
+          <button class="action-pill-btn" id="btnReplayAll" onclick="replayAll(event)">
             <span>✨</span> Xem Từ Đầu
           </button>
         </div>
@@ -1419,8 +1420,8 @@
       document.getElementById('letterRecipientHeader').textContent = `Gửi ${targetRecipient}! 🌸`;
     }
 
-    /* =========================================================
-       4. CINEMATIC FLOW CONTROLLER (AUTOMATED & SEAMLESS)
+        /* =========================================================
+       4. CINEMATIC FLOW CONTROLLER (IOS SAFARI OPTIMIZED)
        ========================================================= */
     const stageIntro = document.getElementById('stageIntro');
     const stageGardenCinematic = document.getElementById('stageGardenCinematic');
@@ -1437,96 +1438,10 @@
     const bnhVideo = document.getElementById('bnhVideo');
     const videoPlayHint = document.getElementById('videoPlayHint');
 
-    // Trigger Start
-    stageIntro.addEventListener('click', () => {
-      const bgAudio = document.getElementById('bgAudio');
-      if (bgAudio) {
-        bgAudio.volume = 0.65;
-        bgAudio.play().catch(e => console.log('Audio play error:', e));
-      }
-      sound.playHarpGlissando();
+    const musicIconOn = document.getElementById('musicIconOn');
+    const musicIconOff = document.getElementById('musicIconOff');
 
-      stageIntro.style.opacity = '0';
-      stageIntro.style.transform = 'scale(0.85)';
-
-      setTimeout(() => {
-        stageIntro.style.display = 'none';
-        runCinematicSequence();
-      }, 700);
-    });
-
-    function runCinematicSequence() {
-      // 1. ACT 1: SINGLE FLOWER BLOOM (0s - 3s)
-      stageGardenCinematic.classList.add('active');
-      singleHeroFlower.style.display = 'block';
-      gardenMeadowRow.style.display = 'none';
-      storyTitle.textContent = 'Đóa Hoa Đầu Tiên';
-      storyDesc.textContent = '“Mỗi người phụ nữ là một đóa hoa độc bản, mang ánh sáng dịu dàng sưởi ấm thế gian...”';
-
-      // 2. ACT 2: GARDEN EXPANDS (after 3.2s)
-      setTimeout(() => {
-        sound.playHarpGlissando();
-        triggerConfettiBurst(40);
-
-        singleHeroFlower.style.opacity = '0';
-        singleHeroFlower.style.transform = 'scale(0.5)';
-
-        setTimeout(() => {
-          singleHeroFlower.style.display = 'none';
-          storyTitle.textContent = 'Vườn Hoa Rực Rỡ';
-          storyDesc.textContent = '“Cả một vườn hoa ngát hương cùng nhau khoe sắc đón chào ngày 20/10...”';
-          gardenMeadowRow.style.display = 'flex';
-          gardenMeadowRow.style.opacity = '0';
-          setTimeout(() => gardenMeadowRow.style.opacity = '1', 50);
-        }, 600);
-      }, 3400);
-
-      // 3. ACT 3: AUTOMATIC GATHERING INTO BOUQUET (after 6.8s)
-      setTimeout(() => {
-        storyTitle.textContent = 'Kết Tinh Bó Hoa Trao Nàng';
-        storyDesc.textContent = '“Từng đóa hoa tươi thắm nhất tự động quy tụ, dệt nên một bó hoa tuyệt mỹ dành tặng bạn...”';
-
-        // Animate each flower lifting into bouquet
-        const cards = [
-          document.getElementById('card0'),
-          document.getElementById('card1'),
-          document.getElementById('card2'),
-          document.getElementById('card3'),
-          document.getElementById('card4')
-        ];
-
-        cards.forEach((card, idx) => {
-          setTimeout(() => {
-            sound.playFlowerPluck(idx); // Tiếng hái hoa thánh thót lấp lánh
-            card.classList.add('gathering');
-            for (let p = 0; p < 12; p++) {
-              petals.push(createPetal(true, width * 0.5 + (Math.random() - 0.5) * 100, height * 0.5));
-            }
-          }, idx * 350);
-        });
-
-        // Tiếng xoè giấy lụa & ruy băng gói hoa
-        setTimeout(() => {
-          sound.playWrapSwoosh();
-        }, 1600);
-
-        // After all gathered -> REVEAL BOUQUET with triumph chimes
-        setTimeout(() => {
-          sound.playBouquetReveal(); // Chùm chuông pha lê khi bó hoa xuất hiện
-          triggerConfettiBurst(80);
-
-          stageGardenCinematic.classList.remove('active');
-          setTimeout(() => {
-            stageGardenCinematic.style.display = 'none';
-            stageBouquetReveal.classList.add('active');
-          }, 700);
-        }, 2200);
-
-      }, 6800);
-    }
-
-    // OPEN LETTER
-    // Save initial raw message text for typewriter effect
+    // Typewriter variables
     const letterTextEl = document.getElementById('letterTextBody');
     const initialLetterMessage = letterTextEl ? letterTextEl.textContent.trim() : '';
     let typewriterTimer = null;
@@ -1544,11 +1459,10 @@
         if (charIdx < initialLetterMessage.length) {
           const ch = initialLetterMessage.charAt(charIdx);
           letterTextEl.textContent += ch;
-          // Gõ âm thanh cách nốt để chân thực như phím cơ gõ
           if (charIdx % 2 === 0 || ch === ' ' || ch === '
 ') {
-            sound.playTypewriterClick(ch === ' ' || ch === '
-');
+            try { sound.playTypewriterClick(ch === ' ' || ch === '
+'); } catch (e) {}
           }
           charIdx++;
         } else {
@@ -1559,8 +1473,125 @@
       }, speed);
     }
 
-    function openLetterCard() {
-      sound.playEnvelopeOpen(); // Tiếng bóc tem sáp & mở thư
+    // Skip typewriter when tapping letter
+    if (stageLetterView) {
+      stageLetterView.addEventListener('click', (e) => {
+        if (e.target.closest('#btnMysteryGift')) return;
+        if (isTyping && typewriterTimer) {
+          clearInterval(typewriterTimer);
+          typewriterTimer = null;
+          isTyping = false;
+          if (letterTextEl) letterTextEl.textContent = initialLetterMessage;
+        }
+      });
+    }
+
+    // 1. START EXPERIENCE (Touch & Click support for iOS Safari)
+    let hasStarted = false;
+    window.handleStart = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      if (hasStarted) return;
+      hasStarted = true;
+
+      // Play audio safely
+      try {
+        const bgAudio = document.getElementById('bgAudio');
+        if (bgAudio) {
+          try { bgAudio.volume = 0.65; } catch (err) {}
+          bgAudio.play().catch(() => {});
+        }
+      } catch (err) {}
+
+      try {
+        sound.init();
+        sound.playHarpGlissando();
+      } catch (err) {}
+
+      stageIntro.style.opacity = '0';
+      stageIntro.style.transform = 'scale(0.85)';
+
+      setTimeout(() => {
+        stageIntro.style.display = 'none';
+        runCinematicSequence();
+      }, 550);
+    };
+
+    stageIntro.addEventListener('click', window.handleStart);
+    stageIntro.addEventListener('touchend', window.handleStart);
+
+    function runCinematicSequence() {
+      stageGardenCinematic.classList.add('active');
+      singleHeroFlower.style.display = 'block';
+      gardenMeadowRow.style.display = 'none';
+      storyTitle.textContent = 'Đóa Hoa Đầu Tiên';
+      storyDesc.textContent = '“Mỗi người phụ nữ là một đóa hoa độc bản, mang ánh sáng dịu dàng sưởi ấm thế gian...”';
+
+      // Act 2: Garden Expands
+      setTimeout(() => {
+        try { sound.playHarpGlissando(); } catch (e) {}
+        triggerConfettiBurst(40);
+
+        singleHeroFlower.style.opacity = '0';
+        singleHeroFlower.style.transform = 'scale(0.5)';
+
+        setTimeout(() => {
+          singleHeroFlower.style.display = 'none';
+          storyTitle.textContent = 'Vườn Hoa Rực Rỡ';
+          storyDesc.textContent = '“Cả một vườn hoa ngát hương cùng nhau khoe sắc đón chào ngày 20/10...”';
+          gardenMeadowRow.style.display = 'flex';
+          gardenMeadowRow.style.opacity = '0';
+          setTimeout(() => gardenMeadowRow.style.opacity = '1', 50);
+        }, 500);
+      }, 3200);
+
+      // Act 3: Gathering into Bouquet
+      setTimeout(() => {
+        storyTitle.textContent = 'Kết Tinh Bó Hoa Trao Nàng';
+        storyDesc.textContent = '“Từng đóa hoa tươi thắm nhất tự động quy tụ, dệt nên một bó hoa tuyệt mỹ dành tặng bạn...”';
+
+        const cards = [
+          document.getElementById('card0'),
+          document.getElementById('card1'),
+          document.getElementById('card2'),
+          document.getElementById('card3'),
+          document.getElementById('card4')
+        ];
+
+        cards.forEach((card, idx) => {
+          if (!card) return;
+          setTimeout(() => {
+            try { sound.playFlowerPluck(idx); } catch (e) {}
+            card.classList.add('gathering');
+            for (let p = 0; p < 12; p++) {
+              petals.push(createPetal(true, width * 0.5 + (Math.random() - 0.5) * 100, height * 0.5));
+            }
+          }, idx * 320);
+        });
+
+        // Paper Swoosh sound
+        setTimeout(() => {
+          try { sound.playWrapSwoosh(); } catch (e) {}
+        }, 1500);
+
+        // Act 4: Reveal Bouquet
+        setTimeout(() => {
+          try { sound.playBouquetReveal(); } catch (e) {}
+          triggerConfettiBurst(80);
+
+          stageGardenCinematic.classList.remove('active');
+          setTimeout(() => {
+            stageGardenCinematic.style.display = 'none';
+            stageBouquetReveal.classList.add('active');
+          }, 600);
+        }, 2100);
+
+      }, 6400);
+    }
+
+    // 2. OPEN LETTER
+    window.openLetterCard = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      try { sound.playEnvelopeOpen(); } catch (err) {}
       triggerConfettiBurst(50);
 
       stageBouquetReveal.classList.remove('active');
@@ -1569,31 +1600,19 @@
         stageLetterView.style.display = 'flex';
         setTimeout(() => {
           stageLetterView.classList.add('active');
-          startTypewriterLetter(); // Bắt đầu gõ từng chữ kèm tiếng gõ phím
+          startTypewriterLetter();
         }, 20);
       }, 500);
-    }
+    };
 
-    // Nhấp vào thư để hiện toàn bộ chữ ngay nếu không muốn chờ gõ
-    document.getElementById('stageLetterView').addEventListener('click', (e) => {
-      if (e.target.closest('#btnMysteryGift')) return;
-      if (isTyping && typewriterTimer) {
-        clearInterval(typewriterTimer);
-        typewriterTimer = null;
-        isTyping = false;
-        if (letterTextEl) letterTextEl.textContent = initialLetterMessage;
-      }
-    });
-
-    document.getElementById('tuckedLetter').addEventListener('click', openLetterCard);
-    document.getElementById('btnOpenLetter').addEventListener('click', openLetterCard);
-
-    // TRIGGER MYSTERY GIFT -> VIDEO (KHÁ BẢNH)
-    document.getElementById('btnMysteryGift').addEventListener('click', () => {
-      const bgAudio = document.getElementById('bgAudio');
-      if (bgAudio) bgAudio.pause();
-      sound.stopLofiLoop();
-      sound.playConfettiBurst(); // Tiếng nổ pháo hoa rộn rã
+    // 3. TRIGGER MYSTERY GIFT -> KHÁ BẢNH
+    window.triggerMysteryGift = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      try {
+        const bgAudio = document.getElementById('bgAudio');
+        if (bgAudio) bgAudio.pause();
+      } catch (err) {}
+      try { sound.playConfettiBurst(); } catch (err) {}
       triggerConfettiBurst(120);
 
       ambientBg.classList.add('party-mode');
@@ -1601,46 +1620,46 @@
 
       setTimeout(() => {
         stageLetterView.style.display = 'none';
-        stageFinale.classList.add('active');
+        stageFinale.style.display = 'flex';
+        setTimeout(() => stageFinale.classList.add('active'), 20);
 
         bnhVideo.currentTime = 0;
         const playPromise = bnhVideo.play();
         if (playPromise !== undefined) {
           playPromise.catch(() => videoPlayHint.classList.add('visible'));
         }
-      }, 700);
-    });
+      }, 600);
+    };
 
-    document.getElementById('videoContainer').addEventListener('click', () => {
+    // 4. VIDEO PLAY / PAUSE
+    window.toggleVideoPlay = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
       if (bnhVideo.paused) {
         bnhVideo.play().then(() => videoPlayHint.classList.remove('visible')).catch(() => {});
       } else {
         bnhVideo.pause();
         videoPlayHint.classList.add('visible');
       }
-    });
+    };
 
-    document.getElementById('btnFlowerRain').addEventListener('click', () => {
+    // 5. FINALE ACTIONS
+    window.triggerFlowerRain = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
       for (let i = 0; i < 60; i++) {
         petals.push(createPetal(true, Math.random() * width, -10));
       }
       triggerConfettiBurst(80);
-      sound.playTone(1046.50, 'sine', 1.0, 0.2);
-    });
+      try { sound.playTone(1046.50, 'sine', 1.0, 0.2); } catch (err) {}
+    };
 
-    // Replay Video
-    const btnReplayVideo = document.getElementById('btnReplayVideo');
-    if (btnReplayVideo) {
-      btnReplayVideo.addEventListener('click', (e) => {
-        e.stopPropagation();
-        bnhVideo.currentTime = 0;
-        bnhVideo.play().then(() => videoPlayHint.classList.remove('visible')).catch(() => {});
-      });
-    }
+    window.replayVideo = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      bnhVideo.currentTime = 0;
+      bnhVideo.play().then(() => videoPlayHint.classList.remove('visible')).catch(() => {});
+    };
 
-    // Go Back to Letter
-    document.getElementById('btnBackToLetter').addEventListener('click', (e) => {
-      e.stopPropagation();
+    window.backToLetter = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
       bnhVideo.pause();
       bnhVideo.currentTime = 0;
       ambientBg.classList.remove('party-mode');
@@ -1650,15 +1669,15 @@
         stageFinale.style.display = 'none';
         stageLetterView.style.display = 'flex';
         setTimeout(() => stageLetterView.classList.add('active'), 20);
-        const bgAudio = document.getElementById('bgAudio');
-        if (bgAudio) bgAudio.play().catch(() => {});
-        sound.startGentleLofiLoop();
+        try {
+          const bgAudio = document.getElementById('bgAudio');
+          if (bgAudio) bgAudio.play().catch(() => {});
+        } catch (err) {}
       }, 400);
-    });
+    };
 
-    // Replay Entire Journey
-    document.getElementById('btnReplayAll').addEventListener('click', (e) => {
-      e.stopPropagation();
+    window.replayAll = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
       bnhVideo.pause();
       bnhVideo.currentTime = 0;
       ambientBg.classList.remove('party-mode');
@@ -1672,25 +1691,22 @@
       stageGardenCinematic.classList.remove('active');
       stageGardenCinematic.style.display = 'none';
 
-      // Reset flowers and hero
       document.querySelectorAll('.garden-flower-card').forEach(c => c.classList.remove('gathering'));
       singleHeroFlower.style.display = 'block';
       singleHeroFlower.style.opacity = '1';
       singleHeroFlower.style.transform = 'scale(1)';
       gardenMeadowRow.style.display = 'none';
 
+      hasStarted = false;
       stageIntro.style.display = 'flex';
       setTimeout(() => {
         stageIntro.style.opacity = '1';
         stageIntro.style.transform = 'scale(1)';
       }, 50);
-    });
+    };
 
-    const soundToggleBtn = document.getElementById('soundToggleBtn');
-    const musicIconOn = document.getElementById('musicIconOn');
-    const musicIconOff = document.getElementById('musicIconOff');
-
-    soundToggleBtn.addEventListener('click', () => {
+    window.toggleSound = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
       const bgAudio = document.getElementById('bgAudio');
       if (bgAudio) {
         if (bgAudio.paused) {
@@ -1703,7 +1719,7 @@
           musicIconOff.style.display = 'block';
         }
       }
-    });
+    };
 
     bnhVideo.addEventListener('ended', () => {
       triggerConfettiBurst(90);
