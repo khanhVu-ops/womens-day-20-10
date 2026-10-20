@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bó Hoa Dâng Mẹ - Chúc Mừng 20/10</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-pink: #ff6b9d;
+      --deep-pink: #c41e5e;
+      --soft-rose: #ffafcc;
+      --gold: #f6d365;
+      --gold-dark: #fda085;
+      --accent-glow: rgba(255, 107, 157, 0.45);
+      --bg-dark: #08020e;
+      --glass-bg: rgba(18, 6, 26, 0.88);
+      --glass-border: rgba(255, 182, 193, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      font-family: 'Montserrat', sans-serif;
+      color: #fff;
+    }
+
+    #bgCanvas, #confettiCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none !important;
+    }
+
+    #bgCanvas { z-index: 1; }
+    #confettiCanvas { z-index: 99; }
+
+    /* Scenic Garden Background */
+    .garden-bg-image {
+      position: absolute;
+      inset: 0;
+      background-image: url('images/garden_bg.jpg');
+      background-size: cover;
+      background-position: center bottom;
+      opacity: 0.22;
+      filter: blur(4px);
+      z-index: 0;
+      transition: opacity 2s ease;
+      pointer-events: none;
+    }
+
+    .ambient-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 35%, rgba(66, 14, 88, 0.8) 0%, rgba(20, 4, 32, 0.95) 55%, #08020e 100%);
+      z-index: 1;
+      transition: background 1.5s ease;
+      pointer-events: none;
+    }
+
+    .ambient-bg.party-mode {
+      background: radial-gradient(circle at 50% 50%, rgba(85, 10, 102, 0.9) 0%, rgba(30, 4, 52, 0.95) 45%, #05010a 100%);
+    }
+
+    .sound-btn-box {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 60;
+    }
+
+    .glass-btn-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffd1dc;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .glass-btn-icon:hover {
+      transform: scale(1.1);
+      border-color: var(--primary-pink);
+      color: #fff;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .glass-btn-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    .app-viewport {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    /* ========================================================
+       STAGE 0: GENTLE TOUCH TO BEGIN
+       ======================================================== */
+    #stageIntro {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      z-index: 30;
+      transition: all 0.8s ease;
+      padding: 20px;
+    }
+
+    .intro-flower-icon {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      box-shadow: 0 0 35px rgba(255, 107, 157, 0.8), 0 0 70px rgba(246, 211, 101, 0.5);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      overflow: hidden;
+      margin-bottom: 24px;
+      animation: breatheGlow 2.5s infinite alternate;
+      position: relative;
+    }
+
+    .intro-flower-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .intro-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 15%, #ffd1dc 55%, #f6d365 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .intro-sub {
+      font-size: 15px;
+      color: rgba(255, 225, 240, 0.9);
+      margin-bottom: 24px;
+      font-weight: 400;
+    }
+
+    .tap-start-btn {
+      padding: 12px 30px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #ff6b9d 0%, #c41e5e 100%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 6px 25px rgba(255, 107, 157, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: pulseBtn 1.8s infinite;
+    }
+
+    /* ========================================================
+       STAGE 1: CINEMATIC FLOWER & ENCHANTED GARDEN
+       ======================================================== */
+    #stageGardenCinematic {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      opacity: 0;
+      transition: opacity 1s ease;
+      padding: 20px;
+    }
+
+    #stageGardenCinematic.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Central Story Caption */
+    .story-caption-box {
+      text-align: center;
+      margin-bottom: 26px;
+      max-width: 620px;
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 25;
+    }
+
+    .story-caption-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff, #ffd1dc, #f6d365);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
+      transition: all 0.5s ease;
+    }
+
+    .story-caption-desc {
+      font-size: 14.5px;
+      color: rgba(255, 220, 235, 0.85);
+      font-weight: 400;
+      transition: all 0.5s ease;
+    }
+
+    /* Act 1: Single Rose Hero Container */
+    #singleHeroFlower {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 182, 193, 0.5);
+      box-shadow: 0 0 50px rgba(255, 64, 129, 0.6), 0 0 100px rgba(246, 211, 101, 0.4);
+      overflow: hidden;
+      position: relative;
+      animation: floatHero 4s ease-in-out infinite alternate;
+      transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    #singleHeroFlower img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.05);
+    }
+
+    /* Act 2: Whole Garden Meadow Array */
+    #gardenMeadowRow {
+      display: none;
+      width: 100%;
+      max-width: 820px;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      z-index: 20;
+    }
+
+    .garden-flower-card {
+      width: 130px;
+      height: 170px;
+      background: rgba(20, 6, 28, 0.65);
+      border: 1.5px solid rgba(255, 182, 193, 0.3);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 107, 157, 0.2);
+      transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+
+    .flower-thumb-circle {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      margin-bottom: 8px;
+    }
+
+    .flower-thumb-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .flower-tag-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #ffeef4;
+      text-align: center;
+    }
+
+    /* Gathering animation states */
+    .garden-flower-card.gathering {
+      transform: scale(0.3) translate(0, -150px);
+      opacity: 0;
+      filter: drop-shadow(0 0 25px #ffd700);
+    }
+
+    /* ========================================================
+       STAGE 2: THE LUXURY FLORIST BOUQUET PRESENTATION
+       ======================================================== */
+    #stageBouquetReveal {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+      padding: 16px;
+    }
+
+    #stageBouquetReveal.active {
+      display: flex;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .bouquet-arched-frame {
+      position: relative;
+      width: 320px;
+      height: 420px;
+      border-radius: 200px 200px 40px 40px;
+      background: radial-gradient(circle at 50% 40%, rgba(255, 182, 193, 0.15) 0%, rgba(20, 6, 30, 0.8) 100%);
+      border: 2px solid rgba(246, 211, 101, 0.45);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 50px rgba(255, 107, 157, 0.4);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      animation: floatHero 4s ease-in-out infinite alternate;
+    }
+
+    .bouquet-photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+    }
+
+    /* Tucked Envelope inside Bouquet */
+    .tucked-bouquet-letter {
+      position: absolute;
+      top: 140px;
+      width: 160px;
+      height: 100px;
+      background: linear-gradient(135deg, #fffdfa 0%, #ffeedb 100%);
+      border: 2px solid #e09f58;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(246, 211, 101, 0.7);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 35;
+      transform: rotate(-6deg);
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .tucked-bouquet-letter:hover {
+      transform: rotate(0deg) scale(1.1);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 107, 157, 0.9);
+    }
+
+    .wax-seal-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ff4081 0%, #b71c1c 100%);
+      border: 2px solid #ffd700;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffd700;
+      font-size: 16px;
+    }
+
+    .tucked-tag-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #6d330c;
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .open-letter-action-btn {
+      margin-top: 22px;
+      padding: 13px 32px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #ff6b9d 0%, #c41e5e 100%);
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 6px 25px rgba(255, 107, 157, 0.6);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: pulseBtn 1.8s infinite;
+      transition: all 0.3s ease;
+      z-index: 40;
+    }
+
+    .open-letter-action-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 35px rgba(255, 107, 157, 0.9);
+    }
+
+    /* ========================================================
+       STAGE 3: THE PERFECTLY FITTED LETTER (NO SCROLL)
+       ======================================================== */
+    #stageLetterView {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 35;
+      opacity: 0;
+      transform: translateY(20px) scale(0.96);
+      transition: all 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+      padding: 16px;
+    }
+
+    #stageLetterView.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .letter-parchment-card {
+      width: 100%;
+      max-width: 540px;
+      background: var(--glass-bg);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 24px 26px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(255, 107, 157, 0.25);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    .letter-parchment-card::-webkit-scrollbar {
+      display: none;
+    }
+
+    .letter-parchment-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #ff6b9d, #f6d365, #ff6b9d);
+    }
+
+    .letter-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      border-bottom: 1px dashed rgba(255, 182, 193, 0.25);
+      padding-bottom: 8px;
+    }
+
+    .letter-badge {
+      font-size: 12px;
+      font-weight: 700;
+      color: #f6d365;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .letter-date {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: 500;
+    }
+
+    .letter-salutation {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffd1dc;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .letter-content-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 15.5px;
+      line-height: 1.8;
+      color: #fff0f6;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      margin-bottom: 16px;
+      white-space: pre-line;
+    }
+
+    .letter-signature {
+      font-family: 'Dancing Script', cursive;
+      font-size: 22px;
+      color: #f6d365;
+      text-align: right;
+      margin-bottom: 16px;
+    }
+
+    .mystery-box-section {
+      background: linear-gradient(135deg, rgba(255, 71, 133, 0.2) 0%, rgba(246, 211, 101, 0.2) 100%);
+      border: 1.5px dashed #ffd700;
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .mystery-box-section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(246, 211, 101, 0.5);
+      background: linear-gradient(135deg, rgba(255, 71, 133, 0.3) 0%, rgba(246, 211, 101, 0.3) 100%);
+    }
+
+    .mystery-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .mystery-tag {
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffd700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .mystery-desc {
+      font-size: 13px;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .gift-btn {
+      padding: 9px 18px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+      color: #2b0b3a;
+      font-weight: 800;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(246, 211, 101, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      animation: pulseBtn 1.8s infinite;
+    }
+
+    /* ========================================================
+       STAGE 4: GRAND FINALE - VIDEO TWIST (KHÁ BẢNH)
+       ======================================================== */
+    #stageFinale {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      padding: 16px;
+    }
+
+    #stageFinale.active {
+      display: flex;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .vip-stage-box {
+      width: 100%;
+      max-width: 550px;
+      background: rgba(18, 6, 29, 0.94);
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, #ffd700, #ff007f, #00f0ff, #ffd700) 1;
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 0 50px rgba(255, 0, 128, 0.5), 0 0 80px rgba(255, 215, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .neon-marquee-container {
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 7px 0;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .neon-marquee-text {
+      display: inline-block;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ffd700;
+      text-shadow: 0 0 10px #ffd700, 0 0 20px #ff007f;
+      animation: marquee 12s linear infinite;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .video-viewport {
+      width: 100%;
+      aspect-ratio: 107 / 96;
+      max-height: 380px;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 107, 157, 0.3);
+      cursor: pointer;
+    }
+
+    video#bnhVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .video-play-hint {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 5;
+    }
+
+    .video-play-hint.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .play-circle-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #ff007f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 30px #ff007f;
+      margin-bottom: 8px;
+    }
+
+    .play-circle-btn svg {
+      width: 28px;
+      height: 28px;
+      fill: #fff;
+      margin-left: 3px;
+    }
+
+    .viral-quote-banner {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 14.5px;
+      font-weight: 700;
+      line-height: 1.4;
+      background: linear-gradient(90deg, #ff6b9d, #ffd700, #ff6b9d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(255, 107, 157, 0.5);
+    }
+
+    .finale-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      width: 100%;
+      margin-top: 14px;
+      justify-content: center;
+    }
+
+    .action-pill-btn {
+      padding: 9px 18px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .action-pill-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+    }
+
+    .action-pill-btn.primary {
+      background: linear-gradient(135deg, #ff4785 0%, #ff007f 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(255, 0, 128, 0.4);
+    }
+
+    /* Keyframes */
+    @keyframes breatheGlow {
+      0% { transform: scale(0.96); box-shadow: 0 0 35px rgba(255, 107, 157, 0.6); }
+      100% { transform: scale(1.06); box-shadow: 0 0 65px rgba(255, 107, 157, 1), 0 0 90px rgba(246, 211, 101, 0.7); }
+    }
+
+    @keyframes floatHero {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-12px); }
+    }
+
+    @keyframes pulseBtn {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); box-shadow: 0 4px 25px rgba(255, 215, 0, 0.8); }
+    }
+
+    @media (max-width: 600px) {
+      .intro-title { font-size: 24px; }
+      #singleHeroFlower { width: 180px; height: 180px; }
+      .garden-flower-card { width: 95px; height: 140px; padding: 6px; }
+      .flower-thumb-circle { width: 68px; height: 68px; }
+      .flower-tag-name { font-size: 11px; }
+      .bouquet-arched-frame { width: 280px; height: 380px; }
+      .story-caption-title { font-size: 20px; }
+      .letter-salutation { font-size: 17.5px; }
+      .letter-content-text { font-size: 14px; line-height: 1.65; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="garden-bg-image"></div>
+  <div class="ambient-bg" id="ambientBg"></div>
+  <canvas id="bgCanvas"></canvas>
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="sound-btn-box">
+    <button class="glass-btn-icon" id="soundToggleBtn" title="Bật/Tắt Nhạc Nền">
+      <svg id="musicIconOn" viewBox="0 0 24 24">
+        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+      </svg>
+      <svg id="musicIconOff" viewBox="0 0 24 24" style="display: none;">
+        <path d="M4.27 3L3 4.27l9 9v.28c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4v-1.73l4.27 4.27L19.73 21 21 19.73 4.27 3zM14 7h4V3h-6v5.18l2 2V7z"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="app-viewport">
+
+    <!-- ========================================================
+         STAGE 0: GENTLE TOUCH TO BEGIN
+         ======================================================== -->
+    <div id="stageIntro">
+      <div class="intro-flower-icon">
+        <img src="images/rose.jpg" alt="Hoa Hồng Tuyệt Mỹ">
+      </div>
+      <h1 class="intro-title">Chào Ngày Phụ Nữ Việt Nam</h1>
+      <p class="intro-sub">Chạm nhẹ để bắt đầu hành trình kỳ diệu dệt nên bó hoa dành tặng bạn ✨</p>
+      <button class="tap-start-btn">
+        <span>Bắt Đầu Hành Trình 🌸</span>
+      </button>
+    </div>
+
+    <!-- ========================================================
+         STAGE 1: CINEMATIC BLOOM & ENCHANTED GARDEN
+         ======================================================== -->
+    <div id="stageGardenCinematic">
+      
+      <div class="story-caption-box">
+        <div class="story-caption-title" id="storyTitle">Đóa Hoa Đầu Tiên</div>
+        <div class="story-caption-desc" id="storyDesc">“Mỗi người phụ nữ là một đóa hoa độc bản, mang ánh sáng dịu dàng sưởi ấm thế gian...”</div>
+      </div>
+
+      <!-- Hero Single Rose -->
+      <div id="singleHeroFlower">
+        <img src="images/rose.jpg" alt="Đóa Hoa Độc Bản">
+      </div>
+
+      <!-- The 5 Meadow Flowers in Garden -->
+      <div id="gardenMeadowRow">
+        <div class="garden-flower-card" id="card0">
+          <div class="flower-thumb-circle">
+            <img src="images/rose.jpg" alt="Hồng Nhung">
+          </div>
+          <span class="flower-tag-name">🌹 Hồng Nhung</span>
+        </div>
+
+        <div class="garden-flower-card" id="card1">
+          <div class="flower-thumb-circle">
+            <img src="images/tulip.jpg" alt="Tulip">
+          </div>
+          <span class="flower-tag-name">🌷 Tulip Hồng</span>
+        </div>
+
+        <div class="garden-flower-card" id="card2">
+          <div class="flower-thumb-circle">
+            <img src="images/sunflower.jpg" alt="Hướng Dương">
+          </div>
+          <span class="flower-tag-name">🌻 Hướng Dương</span>
+        </div>
+
+        <div class="garden-flower-card" id="card3">
+          <div class="flower-thumb-circle">
+            <img src="images/peony.jpg" alt="Mẫu Đơn">
+          </div>
+          <span class="flower-tag-name">🌺 Mẫu Đơn</span>
+        </div>
+
+        <div class="garden-flower-card" id="card4">
+          <div class="flower-thumb-circle">
+            <img src="images/daisy.jpg" alt="Cúc Họa Mi">
+          </div>
+          <span class="flower-tag-name">🌼 Họa Mi</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================================
+         STAGE 2: THE LUXURY FLORIST BOUQUET
+         ======================================================== -->
+    <div id="stageBouquetReveal">
+      
+      <div class="bouquet-arched-frame">
+        <img class="bouquet-photo-img" src="images/bouquet.jpg" alt="Bó Hoa Tuyệt Mỹ 20/10">
+        
+        <!-- Tucked letter in bouquet -->
+        <div class="tucked-bouquet-letter" id="tuckedLetter">
+          <div class="wax-seal-badge">★</div>
+          <span class="tucked-tag-label">Mở Bức Thư 💌</span>
+        </div>
+      </div>
+
+      <button class="open-letter-action-btn" id="btnOpenLetter">
+        <span>Mở Bức Thư Chúc Mừng 20/10 💌</span>
+      </button>
+
+    </div>
+
+    <!-- ========================================================
+         STAGE 3: THE PERFECTLY FITTED LETTER (NO SCROLL)
+         ======================================================== -->
+    <div id="stageLetterView">
+      <div class="letter-parchment-card">
+        
+        <div class="letter-top-row">
+          <div class="letter-badge">
+            <span>💌</span> THƯ CHÚC MỪNG 20/10
+          </div>
+          <div class="letter-date">20 Tháng 10, 2026</div>
+        </div>
+
+        <div class="letter-salutation" id="letterRecipientHeader">
+          Kính gửi Mẹ yêu — người phụ nữ vĩ đại nhất cuộc đời con! 🌷
+        </div>
+
+        <div class="letter-content-text" id="letterTextBody">
+          Nhân ngày Phụ nữ Việt Nam 20/10, con chúc Mẹ luôn ngập tràn sức khỏe, an vui và nụ cười thanh xuân luôn rạng rỡ trên môi.
+
+          Cảm ơn đôi bàn tay tảo tần và tình thương bao la không bến bờ của Mẹ đã nuôi nấng, chở che cho con khôn lớn. Từng đóa hoa trong bó hoa này là một lời tri ân sâu sắc nhất từ tận đáy lòng mà con muốn gửi trọn đến Mẹ.
+
+          Con chỉ mong Mẹ luôn an nhiên, khỏe mạnh và sống đời bình an, hạnh phúc bên con cháu mỗi ngày! 💐
+        </div>
+
+        <div class="letter-signature">
+          ~ Con yêu Mẹ rất nhiều! ~
+        </div>
+
+        <!-- The Mystery Gift Trigger (Khá Bảnh Climax) -->
+        <div class="mystery-box-section" id="btnMysteryGift">
+          <div class="mystery-info">
+            <span class="mystery-tag">
+              <span>🎁</span> MÓN QUÀ BẤT NGỜ TỪ ĐẠI SỨ ĐẶC BIỆT
+            </span>
+            <span class="mystery-desc">Có một thông điệp năng lượng tối thượng gửi riêng cho bạn!</span>
+          </div>
+          <button class="gift-btn">
+            <span>Mở Quà ⚡</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================
+         STAGE 4: GRAND FINALE / VIRAL VIDEO TWIST
+         ======================================================== -->
+    <div id="stageFinale">
+      <div class="vip-stage-box">
+        
+        <div class="neon-marquee-container">
+          <div class="neon-marquee-text">
+            ★ CHÚC CHỊ EM 20/10 VUI VẺ ★ RỰC RỠ XINH GÁI ★ HẠNH PHÚC RẤT CHI LÀ HẠNH PHÚC NHÁ ★
+          </div>
+        </div>
+
+        <div class="video-viewport" id="videoContainer">
+          <video id="bnhVideo" playsinline preload="auto">
+            <source src="video.mp4" type="video/mp4">
+            Trình duyệt không hỗ trợ thẻ video.
+          </video>
+          
+          <div class="video-play-hint" id="videoPlayHint">
+            <div class="play-circle-btn">
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </div>
+            <span style="font-weight: 700; font-size: 15px;">Bấm để xem Đại Sứ chúc mừng!</span>
+          </div>
+        </div>
+
+        <div class="viral-quote-banner">
+          “Chị em nào cũng rực rỡ xinh gái & luôn hạnh phúc rất chi là hạnh phúc nhá!”
+        </div>
+
+        <div class="finale-actions">
+          <button class="action-pill-btn primary" id="btnFlowerRain">
+            <span>🌸</span> Rắc Mưa Hoa
+          </button>
+          <button class="action-pill-btn" id="btnBackToLetter">
+            <span>💌</span> Xem Lại Thư
+          </button>
+          <button class="action-pill-btn" id="btnReplayAll">
+            <span>✨</span> Xem Từ Đầu
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* =========================================================
+       1. WEB AUDIO SYNTHESIZER
+       ========================================================= */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.isPlaying = false;
+        this.masterGain = null;
+        this.timer = null;
+        this.isMuted = false;
+      }
+
+      init() {
+        try {
+          if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+              this.ctx = new AudioContext();
+              this.masterGain = this.ctx.createGain();
+              this.masterGain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+              this.masterGain.connect(this.ctx.destination);
+            }
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+        } catch (e) {}
+      }
+
+      playTone(freq, type = 'sine', duration = 1.6, gainVal = 0.25) {
+        try {
+          if (!this.ctx || this.isMuted) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(gainVal, this.ctx.currentTime + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.masterGain);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {}
+      }
+
+      playHarpGlissando() {
+        try {
+          this.init();
+          const notes = [440, 523.25, 659.25, 783.99, 880, 1046.50, 1318.51];
+          notes.forEach((freq, idx) => {
+            setTimeout(() => this.playTone(freq, 'sine', 2.0, 0.2), idx * 80);
+          });
+        } catch (e) {}
+      }
+
+      startGentleLofiLoop() {
+        try {
+          if (this.isPlaying) return;
+          this.init();
+          this.isPlaying = true;
+          const progressions = [
+            [261.63, 329.63, 392.00, 493.88],
+            [220.00, 261.63, 329.63, 392.00],
+            [174.61, 220.00, 261.63, 329.63],
+            [196.00, 261.63, 293.66, 392.00]
+          ];
+          let chordIdx = 0;
+          const tick = () => {
+            if (!this.isPlaying) return;
+            const chord = progressions[chordIdx];
+            chord.forEach((freq, i) => {
+              setTimeout(() => this.playTone(freq, 'triangle', 2.4, 0.09), i * 160);
+            });
+            const melody = [523.25, 587.33, 659.25, 783.99, 880.00];
+            setTimeout(() => {
+              const rNote = melody[Math.floor(Math.random() * melody.length)];
+              this.playTone(rNote, 'sine', 1.5, 0.08);
+            }, 800);
+            chordIdx = (chordIdx + 1) % progressions.length;
+            this.timer = setTimeout(tick, 2800);
+          };
+          tick();
+        } catch (e) {}
+      }
+
+      stopLofiLoop() {
+        this.isPlaying = false;
+        if (this.timer) clearTimeout(this.timer);
+      }
+
+      toggleMute() {
+        this.isMuted = !this.isMuted;
+        if (this.masterGain && this.ctx) {
+          try {
+            this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 0.18, this.ctx.currentTime);
+          } catch (e) {}
+        }
+        return this.isMuted;
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    /* =========================================================
+       2. CANVAS ENGINE: BOKEH, PETALS & CONFETTI
+       ========================================================= */
+    const bgCanvas = document.getElementById('bgCanvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    const confettiCtx = confettiCanvas.getContext('2d');
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    function resizeCanvases() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      bgCanvas.width = width;
+      bgCanvas.height = height;
+      confettiCanvas.width = width;
+      confettiCanvas.height = height;
+    }
+    window.addEventListener('resize', resizeCanvases);
+    resizeCanvases();
+
+    const stars = [];
+    const petals = [];
+    const fireworks = [];
+
+    for (let i = 0; i < 70; i++) {
+      stars.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 2 + 0.5,
+        alpha: Math.random(),
+        speed: Math.random() * 0.02 + 0.008,
+        drift: (Math.random() - 0.5) * 0.3
+      });
+    }
+
+    function createPetal(burst = false, customX, customY) {
+      return {
+        x: customX !== undefined ? customX : Math.random() * width,
+        y: customY !== undefined ? customY : (burst ? height * 0.45 : -20),
+        size: Math.random() * 14 + 10,
+        vx: burst ? (Math.random() - 0.5) * 8 : (Math.random() - 0.5) * 1.5 + 0.5,
+        vy: burst ? (Math.random() - 0.5) * 8 - 3 : Math.random() * 1.2 + 0.8,
+        angle: Math.random() * Math.PI * 2,
+        vAngle: (Math.random() - 0.5) * 0.04,
+        color: ['#ff85a2', '#ff5c8a', '#ff99c8', '#fec5bb', '#ff477e', '#ffd1dc'][Math.floor(Math.random() * 6)],
+        opacity: Math.random() * 0.4 + 0.5,
+        flapSpeed: Math.random() * 0.08 + 0.03,
+        flapAngle: 0
+      };
+    }
+
+    for (let i = 0; i < 28; i++) {
+      const p = createPetal();
+      p.y = Math.random() * height;
+      petals.push(p);
+    }
+
+    function triggerConfettiBurst(count = 90) {
+      for (let i = 0; i < count; i++) {
+        fireworks.push({
+          x: width * 0.5 + (Math.random() - 0.5) * 200,
+          y: height * 0.45 + (Math.random() - 0.5) * 150,
+          vx: (Math.random() - 0.5) * 16,
+          vy: (Math.random() - 0.5) * 16 - 4,
+          gravity: 0.22,
+          size: Math.random() * 8 + 4,
+          rotation: Math.random() * 360,
+          vRot: (Math.random() - 0.5) * 15,
+          color: ['#ffd700', '#ff007f', '#00f0ff', '#ff6b9d', '#ffffff', '#7000ff'][Math.floor(Math.random() * 6)],
+          alpha: 1.0,
+          decay: Math.random() * 0.012 + 0.008
+        });
+      }
+    }
+
+    function renderLoop() {
+      bgCtx.clearRect(0, 0, width, height);
+      for (const s of stars) {
+        s.alpha += s.speed;
+        s.x += s.drift;
+        if (s.x < 0) s.x = width;
+        if (s.x > width) s.x = 0;
+        const currentAlpha = 0.3 + 0.5 * Math.sin(s.alpha);
+        bgCtx.fillStyle = `rgba(255, 230, 245, ${Math.max(0, currentAlpha)})`;
+        bgCtx.beginPath();
+        bgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        bgCtx.fill();
+      }
+
+      for (let i = 0; i < petals.length; i++) {
+        const p = petals[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.angle += p.vAngle;
+        p.flapAngle += p.flapSpeed;
+        if (p.y > height + 20 || p.x < -40 || p.x > width + 40) {
+          petals[i] = createPetal();
+        }
+        bgCtx.save();
+        bgCtx.translate(p.x, p.y);
+        bgCtx.rotate(p.angle);
+        const scaleX = Math.cos(p.flapAngle);
+        bgCtx.scale(scaleX, 1);
+        bgCtx.fillStyle = p.color;
+        bgCtx.globalAlpha = p.opacity;
+        bgCtx.beginPath();
+        bgCtx.moveTo(0, 0);
+        bgCtx.bezierCurveTo(p.size * 0.6, -p.size * 0.4, p.size * 0.8, p.size * 0.7, 0, p.size);
+        bgCtx.bezierCurveTo(-p.size * 0.8, p.size * 0.7, -p.size * 0.6, -p.size * 0.4, 0, 0);
+        bgCtx.fill();
+        bgCtx.restore();
+      }
+
+      confettiCtx.clearRect(0, 0, width, height);
+      for (let i = fireworks.length - 1; i >= 0; i--) {
+        const f = fireworks[i];
+        f.x += f.vx;
+        f.y += f.vy;
+        f.vy += f.gravity;
+        f.rotation += f.vRot;
+        f.alpha -= f.decay;
+        if (f.alpha <= 0) {
+          fireworks.splice(i, 1);
+          continue;
+        }
+        confettiCtx.save();
+        confettiCtx.translate(f.x, f.y);
+        confettiCtx.rotate(f.rotation * Math.PI / 180);
+        confettiCtx.fillStyle = f.color;
+        confettiCtx.globalAlpha = f.alpha;
+        confettiCtx.fillRect(-f.size / 2, -f.size / 2, f.size, f.size * 1.4);
+        confettiCtx.restore();
+      }
+
+      requestAnimationFrame(renderLoop);
+    }
+    requestAnimationFrame(renderLoop);
+
+    /* =========================================================
+       3. URL CUSTOMIZATION (TO=NAME)
+       ========================================================= */
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetRecipient = urlParams.get('to') || urlParams.get('name');
+    if (targetRecipient) {
+      document.getElementById('letterRecipientHeader').textContent = `Gửi ${targetRecipient}! 🌸`;
+    }
+
+    /* =========================================================
+       4. CINEMATIC FLOW CONTROLLER (AUTOMATED & SEAMLESS)
+       ========================================================= */
+    const stageIntro = document.getElementById('stageIntro');
+    const stageGardenCinematic = document.getElementById('stageGardenCinematic');
+    const singleHeroFlower = document.getElementById('singleHeroFlower');
+    const gardenMeadowRow = document.getElementById('gardenMeadowRow');
+    const storyTitle = document.getElementById('storyTitle');
+    const storyDesc = document.getElementById('storyDesc');
+
+    const stageBouquetReveal = document.getElementById('stageBouquetReveal');
+    const stageLetterView = document.getElementById('stageLetterView');
+    const stageFinale = document.getElementById('stageFinale');
+
+    const ambientBg = document.getElementById('ambientBg');
+    const bnhVideo = document.getElementById('bnhVideo');
+    const videoPlayHint = document.getElementById('videoPlayHint');
+
+    // Trigger Start
+    stageIntro.addEventListener('click', () => {
+      sound.startGentleLofiLoop();
+      sound.playHarpGlissando();
+
+      stageIntro.style.opacity = '0';
+      stageIntro.style.transform = 'scale(0.85)';
+
+      setTimeout(() => {
+        stageIntro.style.display = 'none';
+        runCinematicSequence();
+      }, 700);
+    });
+
+    function runCinematicSequence() {
+      // 1. ACT 1: SINGLE FLOWER BLOOM (0s - 3s)
+      stageGardenCinematic.classList.add('active');
+      singleHeroFlower.style.display = 'block';
+      gardenMeadowRow.style.display = 'none';
+      storyTitle.textContent = 'Đóa Hoa Đầu Tiên';
+      storyDesc.textContent = '“Mỗi người phụ nữ là một đóa hoa độc bản, mang ánh sáng dịu dàng sưởi ấm thế gian...”';
+
+      // 2. ACT 2: GARDEN EXPANDS (after 3.2s)
+      setTimeout(() => {
+        sound.playHarpGlissando();
+        triggerConfettiBurst(40);
+
+        singleHeroFlower.style.opacity = '0';
+        singleHeroFlower.style.transform = 'scale(0.5)';
+
+        setTimeout(() => {
+          singleHeroFlower.style.display = 'none';
+          storyTitle.textContent = 'Vườn Hoa Rực Rỡ';
+          storyDesc.textContent = '“Cả một vườn hoa ngát hương cùng nhau khoe sắc đón chào ngày 20/10...”';
+          gardenMeadowRow.style.display = 'flex';
+          gardenMeadowRow.style.opacity = '0';
+          setTimeout(() => gardenMeadowRow.style.opacity = '1', 50);
+        }, 600);
+      }, 3400);
+
+      // 3. ACT 3: AUTOMATIC GATHERING INTO BOUQUET (after 6.8s)
+      setTimeout(() => {
+        storyTitle.textContent = 'Kết Tinh Bó Hoa Trao Nàng';
+        storyDesc.textContent = '“Từng đóa hoa tươi thắm nhất tự động quy tụ, dệt nên một bó hoa tuyệt mỹ dành tặng bạn...”';
+
+        // Animate each flower lifting into bouquet
+        const cards = [
+          document.getElementById('card0'),
+          document.getElementById('card1'),
+          document.getElementById('card2'),
+          document.getElementById('card3'),
+          document.getElementById('card4')
+        ];
+
+        cards.forEach((card, idx) => {
+          setTimeout(() => {
+            sound.playTone(659.25 + idx * 80, 'triangle', 1.5, 0.2);
+            card.classList.add('gathering');
+            for (let p = 0; p < 12; p++) {
+              petals.push(createPetal(true, width * 0.5 + (Math.random() - 0.5) * 100, height * 0.5));
+            }
+          }, idx * 350);
+        });
+
+        // After all gathered -> REVEAL BOUQUET (after 2.6s)
+        setTimeout(() => {
+          sound.playHarpGlissando();
+          triggerConfettiBurst(80);
+
+          stageGardenCinematic.classList.remove('active');
+          setTimeout(() => {
+            stageGardenCinematic.style.display = 'none';
+            stageBouquetReveal.classList.add('active');
+          }, 700);
+        }, 2200);
+
+      }, 6800);
+    }
+
+    // OPEN LETTER
+    function openLetterCard() {
+      sound.playHarpGlissando();
+      triggerConfettiBurst(50);
+
+      stageBouquetReveal.classList.remove('active');
+      setTimeout(() => {
+        stageBouquetReveal.style.display = 'none';
+        stageLetterView.classList.add('active');
+      }, 600);
+    }
+
+    document.getElementById('tuckedLetter').addEventListener('click', openLetterCard);
+    document.getElementById('btnOpenLetter').addEventListener('click', openLetterCard);
+
+    // TRIGGER MYSTERY GIFT -> VIDEO (KHÁ BẢNH)
+    document.getElementById('btnMysteryGift').addEventListener('click', () => {
+      sound.stopLofiLoop();
+      triggerConfettiBurst(120);
+
+      ambientBg.classList.add('party-mode');
+      stageLetterView.classList.remove('active');
+
+      setTimeout(() => {
+        stageLetterView.style.display = 'none';
+        stageFinale.classList.add('active');
+
+        bnhVideo.currentTime = 0;
+        const playPromise = bnhVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => videoPlayHint.classList.add('visible'));
+        }
+      }, 700);
+    });
+
+    document.getElementById('videoContainer').addEventListener('click', () => {
+      if (bnhVideo.paused) {
+        bnhVideo.play().then(() => videoPlayHint.classList.remove('visible')).catch(() => {});
+      } else {
+        bnhVideo.pause();
+        videoPlayHint.classList.add('visible');
+      }
+    });
+
+    document.getElementById('btnFlowerRain').addEventListener('click', () => {
+      for (let i = 0; i < 60; i++) {
+        petals.push(createPetal(true, Math.random() * width, -10));
+      }
+      triggerConfettiBurst(80);
+      sound.playTone(1046.50, 'sine', 1.0, 0.2);
+    });
+
+    document.getElementById('btnBackToLetter').addEventListener('click', () => {
+      bnhVideo.pause();
+      ambientBg.classList.remove('party-mode');
+      stageFinale.classList.remove('active');
+      setTimeout(() => {
+        stageFinale.style.display = 'none';
+        stageLetterView.classList.add('active');
+        sound.startGentleLofiLoop();
+      }, 600);
+    });
+
+    document.getElementById('btnReplayAll').addEventListener('click', () => {
+      bnhVideo.pause();
+      location.reload();
+    });
+
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    const musicIconOn = document.getElementById('musicIconOn');
+    const musicIconOff = document.getElementById('musicIconOff');
+
+    soundToggleBtn.addEventListener('click', () => {
+      const muted = sound.toggleMute();
+      musicIconOn.style.display = muted ? 'none' : 'block';
+      musicIconOff.style.display = muted ? 'block' : 'none';
+      if (!muted && !sound.isPlaying && !stageFinale.classList.contains('active')) {
+        sound.startGentleLofiLoop();
+      }
+    });
+
+    bnhVideo.addEventListener('ended', () => {
+      triggerConfettiBurst(90);
+    });
+  </script>
+</body>
+</html>
